@@ -243,7 +243,7 @@ JF = Jf \
     + MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs) \
     + ARCLENGTH_WEIGHT * sum(Jals) \
     + CS_WEIGHT * Jcsdist \
-    + linkNum
+    + LINK_WEIGHT * linkNum
 
 #J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * sum([QuadraticPenalty(Jls[i], LENGTH_THRESHOLD) for i in range(len(base_curves))])
 # We don't have a general interface in SIMSOPT for optimisation problems that
