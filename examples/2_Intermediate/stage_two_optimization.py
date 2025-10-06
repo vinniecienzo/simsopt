@@ -35,7 +35,7 @@ from simsopt.geo import (SurfaceRZFourier, curves_to_vtk, create_equally_spaced_
                          GaussianSampler, CurvePerturbed, 
                          PerturbationSample, LinkingNumber)
 from simsopt.objectives import Weight, SquaredFlux, QuadraticPenalty
-from simsopt.util import in_github_actions, curve_fourier_fit
+from simsopt.util import in_github_actions
 
 
 start = time.time()
