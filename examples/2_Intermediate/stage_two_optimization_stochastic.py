@@ -346,7 +346,7 @@ proc0_print("""
 
 curves_to_vtk(curves, OUT_DIR / f"curves_opt_{loop_label}")
 curves_to_vtk(base_curves, OUT_DIR / f"base_curves_opt_{loop_label}")
-bs.save(OUT_DIR / "biot_savart_opt.json")
+bs.save(OUT_DIR / f"biot_savart_opt_{loop_label}.json")
 
 bs.set_points(s_plot.gamma().reshape((-1, 3)))
 pointData = {"B_N": np.sum(bs.B().reshape((qphi, qtheta, 3)) * s_plot.unitnormal(), axis=2)[:, :, None]}

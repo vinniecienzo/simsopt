@@ -32,7 +32,7 @@ from simsopt.field import BiotSavart, Current, Coil, coils_via_symmetries
 from simsopt.geo import (SurfaceRZFourier, curves_to_vtk, create_equally_spaced_curves,
                          CurveLength, CurveCurveDistance, MeanSquaredCurvature,
                          LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation,
-                         GaussianSampler, CurvePerturbed, 
+                         GaussianSampler, CurvePerturbed, CurrentPerturbed,
                          PerturbationSample, LinkingNumber)
 from simsopt.objectives import Weight, SquaredFlux, QuadraticPenalty
 from simsopt.util import in_github_actions
@@ -311,7 +311,7 @@ bs.set_points(s.gamma().reshape((-1, 3)))
 
 curves_to_vtk(base_curves, OUT_DIR / f"base_curves_opt_{loop_label}")
 # Save the optimized coil shapes and currents so they can be loaded into other scripts for analysis:
-bs.save(OUT_DIR / "biot_savart_opt.json")
+bs.save(OUT_DIR / f"biot_savart_opt_{loop_label}.json")
 
 #Perturb coils
 seed = 0
