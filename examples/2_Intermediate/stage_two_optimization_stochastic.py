@@ -278,7 +278,7 @@ JF = Jmpi \
     + MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs) \
     + ARCLENGTH_WEIGHT * sum(Jals) \
     + CS_WEIGHT * Jcsdist \
-    + linkNum
+    + LINK_WEIGHT * linkNum
     
 
 # We don't have a general interface in SIMSOPT for optimisation problems that
