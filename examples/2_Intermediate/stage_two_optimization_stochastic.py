@@ -38,7 +38,7 @@ from simsopt.geo import (CurveLength, CurveCurveDistance, curves_to_vtk, create_
                          CurvePerturbed, 
                          PerturbationSample, LinkingNumber)
 from simsopt.objectives import QuadraticPenalty, MPIObjective, SquaredFlux
-from simsopt.util import in_github_actions, proc0_print, comm_world, curve_fourier_fit
+from simsopt.util import in_github_actions, proc0_print, comm_world 
 import json 
 
 
