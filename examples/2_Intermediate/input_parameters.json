@@ -102,7 +102,7 @@
         "surface_filename": "input.rotating_ellipse"
     },
     
-    "QH": {
+    "QH3": {
         "ncoils": 3,
         "R0": 0.95,
         "R1": 0.45,
@@ -121,25 +121,25 @@
         "surface_filename": "input.20210406-01-002-nfp4_QH_000_000240"
     },
 
-    "QH_5coils": {
+    "QH5": {
         "ncoils": 5,
-        "R0": 1.00,
+        "R0": 1,
         "R1": 0.5,
+        "LENGTH_THRESHOLD": 12.31,
         "LENGTH_WEIGHT": 1e-3,
-        "LENGTH_THRESHOLD": 10,
-        "CC_THRESHOLD": 0.1,
-        "CC_WEIGHT": 10,
+        "CC_THRESHOLD": 0.084,
+        "CC_WEIGHT": 100,
         "CS_THRESHOLD": 0.1,
         "CS_WEIGHT": 10,
-        "CURVATURE_THRESHOLD": 5.0,
-        "CURVATURE_WEIGHT": 1e-5,
-        "MSC_THRESHOLD": 5,
-        "MSC_WEIGHT": 1e-6,
-        "ARCLENGTH_WEIGHT": 0.01,
+        "CURVATURE_THRESHOLD": 13,
+        "CURVATURE_WEIGHT": 1e-6,
+        "MSC_THRESHOLD": 1.3,
+        "MSC_WEIGHT": 1.5e-8,
+        "ARCLENGTH_WEIGHT": 0.007,
+        "LINK_WEIGHT": 100,
         "surface_method": "from_vmec_input",
         "surface_filename": "input.20210406-01-002-nfp4_QH_000_000240"
     }
 
   }
-  
   
