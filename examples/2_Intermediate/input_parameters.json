@@ -38,7 +38,28 @@
         "MSC_WEIGHT": 1e-6,
         "ARCLENGTH_WEIGHT": 0.01,
         "FORCE_WEIGHT": 0,
-        "LINK_WEIGHT": 0,
+        "LINK_WEIGHT": 1,
+        "surface_method": "from_focus",
+        "surface_filename": "input.NCSX_c09r00_halfTeslaTF"
+    },
+
+    "NCSX_4coil": {
+        "ncoils": 4,
+        "R0": 1.3,
+        "R1": 0.85,
+        "LENGTH_WEIGHT": 0.0008,
+        "LENGTH_THRESHOLD": 21.0,
+        "CC_THRESHOLD": 0.2,
+        "CC_WEIGHT": 100,
+        "CS_THRESHOLD": 0.15,
+        "CS_WEIGHT": 4e-4,
+        "CURVATURE_THRESHOLD": 5,
+        "CURVATURE_WEIGHT": 1e-6,
+        "MSC_THRESHOLD": 5.0,
+        "MSC_WEIGHT": 1e-6,
+        "ARCLENGTH_WEIGHT": 0.01,
+        "FORCE_WEIGHT": 0,
+        "LINK_WEIGHT": 1,
         "surface_method": "from_focus",
         "surface_filename": "input.NCSX_c09r00_halfTeslaTF"
     },
@@ -59,7 +80,7 @@
         "MSC_WEIGHT": 1e-6,
         "ARCLENGTH_WEIGHT": 0.01,
         "FORCE_WEIGHT": 0,
-        "LINK_WEIGHT": 0,
+        "LINK_WEIGHT": 1,
         "surface_method": "from_vmec_input",
         "surface_filename": "input.LandremanPaul2021_QA"
     },
@@ -117,7 +138,7 @@
         "MSC_THRESHOLD": 5,
         "MSC_WEIGHT": 1e-6,
         "ARCLENGTH_WEIGHT": 0.01,
-        "LINK_WEIGHT":0,
+        "LINK_WEIGHT":1,
         "surface_method": "from_vmec_input",
         "surface_filename": "input.20210406-01-002-nfp4_QH_000_000240"
     },
