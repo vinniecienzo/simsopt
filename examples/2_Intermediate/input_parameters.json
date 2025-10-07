@@ -117,6 +117,7 @@
         "MSC_THRESHOLD": 5,
         "MSC_WEIGHT": 1e-6,
         "ARCLENGTH_WEIGHT": 0.01,
+        "LINK_WEIGHT":0,
         "surface_method": "from_vmec_input",
         "surface_filename": "input.20210406-01-002-nfp4_QH_000_000240"
     },
