@@ -29,27 +29,29 @@ Dependencies:
 
 """
 
-import numpy as np
 import os
-from simsopt.objectives import SquaredFlux
-from simsopt.objectives import QuadraticPenalty
-
-from simsopt.geo import SurfaceRZFourier
-from simsopt.geo import create_equally_spaced_curves
-from simsopt.geo import LinkingNumber
-from simsopt.geo import CurveLength, CurveCurveDistance, \
-    LpCurveCurvature, CurveSurfaceDistance
-from simsopt.solve import augmented_lagrangian_method
-from simsopt.field import BiotSavart, coils_to_vtk
-from simsopt.field.force import LpCurveForce
-from simsopt.field import Current, coils_via_symmetries
-from simsopt.util import calculate_modB_on_major_radius
-from pathlib import Path
 import time
+from pathlib import Path
+from numpy.random import PCG64DXSM, Generator
+import numpy as np
+from scipy.optimize import minimize
+from simsopt.field import BiotSavart, Current, Coil, coils_via_symmetries, coils_to_vtk
+from simsopt.geo import (CurveLength, CurveCurveDistance, curves_to_vtk, create_equally_spaced_curves, SurfaceRZFourier,
+                         MeanSquaredCurvature, LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation, GaussianSampler, 
+                         CurvePerturbed, PerturbationSample, LinkingNumber)
+from simsopt.objectives import QuadraticPenalty, MPIObjective, SquaredFlux
+from simsopt.geo import LinkingNumberfrom 
+from simsopt.field.force import LpCurveForce
+from simsopt.util import calculate_modB_on_major_radius, in_github_actions, proc0_print, comm_world 
+import json
+
+start = time.time()
 
 # Define the output directory   
 OUT_DIR = "./Temp_Storage"
 os.makedirs(OUT_DIR, exist_ok=True)
+
+############# Stopped script synch here ############
 
 # Define the test directory
 TEST_DIR = Path(__file__).parent / '../' / '../' / '../' / 'tests/test_files'

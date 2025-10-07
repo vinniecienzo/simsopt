@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-r"""
+"""
 In this example we solve a stochastic version of the FOCUS like Stage II coil
 optimisation problem: the goal is to find coils that generate a specific target
 normal field on a given surface.  In this particular case we consider a vacuum
