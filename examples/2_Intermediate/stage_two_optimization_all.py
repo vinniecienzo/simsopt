@@ -59,7 +59,7 @@ CURRENT_BASE = 1e5
 SIGMA_CURRENT_OOS = 1e-1 * CURRENT_BASE
 
 # Choose and load input parameters from configuration
-CONFIG_NAME = "QA" 
+CONFIG_NAME = "NCSX_4coil" 
 
 RUN_MODE = 'sigma_l_scan'
 
@@ -134,7 +134,7 @@ TEST_DIR = (Path(__file__).parent / ".." / ".." / "tests" / "test_files").resolv
 filename = TEST_DIR / config["surface_filename"]
 
 # Directory for output
-out_dir_path = f"output_stage_two_optimization_{CONFIG_NAME}_{RUN_MODE}"
+out_dir_path = f"output_stage_two_optimization_all_{CONFIG_NAME}_{RUN_MODE}"
 
 if RUN_MODE == 'pert_init':
     if fourier_fit == True:
@@ -360,7 +360,7 @@ main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
 print(main_results_str)
 
 with open(SUB_DIR / 'main_results.txt', 'a') as f:
-    f.write(f"Run {loop_label}: \n" + main_results_str)
+    f.write(f"Run {loop_label}: \n" + main_results_str + "\n")
 
 #save data as array for plotting
 np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
