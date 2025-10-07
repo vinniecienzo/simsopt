@@ -32,8 +32,8 @@ from simsopt.field import BiotSavart, Current, Coil, coils_via_symmetries
 from simsopt.geo import (SurfaceRZFourier, curves_to_vtk, create_equally_spaced_curves,
                          CurveLength, CurveCurveDistance, MeanSquaredCurvature,
                          LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation,
-                         GaussianSampler, CurvePerturbed, CurrentPerturbed,
-                         PerturbationSample, LinkingNumber)
+                         GaussianSampler, CurvePerturbed,
+                         PerturbationSample, LinkingNumber) # CurrentPerturbed removed should not affect EW1
 from simsopt.objectives import Weight, SquaredFlux, QuadraticPenalty
 from simsopt.util import in_github_actions
 
@@ -54,7 +54,7 @@ N_OOS = 1000
 SIGMA_OOS, L_OOS = 1e-2, 0.5
 
 # Choose and load input parameters from configuration
-CONFIG_NAME = "NCSX"
+CONFIG_NAME = "QH5"
 
 RUN_MODE = 'sigma_l_scan'
 
@@ -75,12 +75,14 @@ elif RUN_MODE == 'sigma_l_scan':
     sigma_values = np.linspace(1e-3, 1e-2, 8) #sigma values to scan
     L_values = np.linspace(0.5, 0.5, 1) #L values to scan
     sigma_and_L = [(sigma, L) for sigma in sigma_values for L in L_values] #pairs of sigma and L
+
+    if slurm_array_int >= len(sigma_and_L):
+        raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(sigma_and_L)} orders")
+
     SIGMA_OOS, L_OOS = sigma_and_L[slurm_array_int] #assign sigma and L using slurm array number
     loop_label = slurm_array_int #specify what to label results for each run
     save_param = (SIGMA_OOS,L_OOS) #relevant parameters to save correspond with saved data
     print(loop_label)
-    if slurm_array_int >= len(sigma_and_L):
-        raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(sigma_and_L)} orders")
     
 elif RUN_MODE == 'order_scan':
     #scan order values 
@@ -112,7 +114,7 @@ MAXITER = 50 if in_github_actions else 1000
 #######################################################
 
 #load configuration
-with open("input_parameters.json") as f:
+with open("000.input_parameters.json") as f:
     all_configs = json.load(f)
 config = all_configs[CONFIG_NAME]
 globals().update(config)  # Assign all keys as variables
@@ -260,8 +262,7 @@ def fun(dofs):
     jf = Jf.J()
     currents = JF.x[:ncoils-1]
     BdotN = np.mean(np.abs(np.sum(bs.B().reshape((nphi, ntheta, 3)) * s.unitnormal(), axis=2)))
-    outstr = f"Iteration {iteration_counter}/{MAXITER}-----\n"
-    outstr += f"currents: {currents}\n"
+    outstr = f"Iteration {iteration_counter}/{MAXITER}-----\n" #outstr += f"currents: {currents}\n"
     outstr += f"J={J:.1e}, Jf={jf:.1e}, ⟨B·n⟩={BdotN:.1e}"
     cl_string = ", ".join([f"{J.J():.1f}" for J in Jls])
     kap_string = ", ".join(f"{np.max(c.kappa()):.1f}" for c in base_curves)
@@ -319,6 +320,7 @@ squared_flux_data = []
 curves_pert_oos = []
 rg = Generator(PCG64DXSM(seed+1))
 sampler = GaussianSampler(curves[0].quadpoints, SIGMA_OOS, L_OOS, n_derivs=1)
+
 for i in range(N_OOS):
     # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
     base_curves_perturbed = [CurvePerturbed(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
@@ -337,6 +339,8 @@ for i in range(N_OOS):
     if (i+1) % (N_OOS/10) == 0:
         print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
         
+
+
 #store main results in string, print and save
 main_results_str = f"Flux Objective for exact coils    : {Jf.J():.3e}\n"
 main_results_str += f"Out-of-sample flux value                  : {np.mean(squared_flux_data):.3e}\n"
