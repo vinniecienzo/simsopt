@@ -126,7 +126,7 @@ L_CURVE_OOS = L_CURVE
 SIGMA_CURRENT_OOS = SIGMA_CURRENT
 
 # Number of iterations to perform:
-MAXITER = 50 if in_github_actions else 2000
+MAXITER = 50 if in_github_actions else 2
 
 #######################################################
 # End of input parameters.
