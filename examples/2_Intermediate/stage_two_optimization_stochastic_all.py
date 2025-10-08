@@ -42,6 +42,7 @@ from simsopt.objectives import QuadraticPenalty, MPIObjective, SquaredFlux
 from simsopt.util import in_github_actions, proc0_print, comm_world, curve_fourier_fit
 from simsopt.field.force import coil_force, LpCurveForce
 from simsopt.field.selffield import regularization_circ
+from util_functions import *
 
 
 start = time.time()
@@ -58,7 +59,7 @@ slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
 order = 24
 
 # Number of samples to approximate the mean
-N_SAMPLES = 50
+N_SAMPLES = 4
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
@@ -68,9 +69,9 @@ CURRENT_BASE = 1e5
 SIGMA_CURRENT = 1e-1 * CURRENT_BASE 
 
 # Pick which configuration you want
-CONFIG_NAME = "NCSX" 
+CONFIG_NAME = "NCSX_4coil" 
 
-RUN_MODE = 'sigma_l_scan'
+RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
@@ -120,7 +121,7 @@ else:
     raise ValueError("No run mode defined")
 
 # Out-of-sample evaluation parameters
-N_OOS = 1000
+N_OOS = 1
 SIGMA_CURVE_OOS = SIGMA_CURVE
 L_CURVE_OOS = L_CURVE
 SIGMA_CURRENT_OOS = SIGMA_CURRENT
@@ -199,7 +200,7 @@ if RUN_MODE == "pert_init":
 
     rg_initial_guess = Generator(PCG64DXSM(seed_initial_guess))
     sampler_initial_guess = GaussianSampler(base_curves_init[0].quadpoints, SIGMA_INITIAL_GUESS, L_INITIAL_GUESS, n_derivs=2)
-    base_curves_pert = [CurvePerturbed(c, PerturbationSample(sampler_initial_guess, randomgen=rg_initial_guess)) for c in base_curves_init]
+    base_curves_pert = [CurvePerturbed_json(c, PerturbationSample(sampler_initial_guess, randomgen=rg_initial_guess)) for c in base_curves_init]
 
     # show initial base coil after perturbation
     curves_to_vtk(base_curves_pert, OUT_DIR / f"base_curves_init_perturbed_{loop_label}")
@@ -258,10 +259,10 @@ curves_pert = []
 print("Starting N_SAMPLE LOOP")
 for i in range(N_SAMPLES):
     # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
-    base_curves_perturbed = [CurvePerturbed(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
+    base_curves_perturbed = [CurvePerturbed_json(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
     coils = coils_via_symmetries(base_curves_perturbed, base_currents, s.nfp, True)
     # now add the 'statistical' error. this error is added to each of the final coils, and independent between all of them.
-    coils_pert = [Coil(CurvePerturbed(c.curve, PerturbationSample(sampler, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT*rg.standard_normal())) for c in coils]
+    coils_pert = [Coil(CurvePerturbed_json(c.curve, PerturbationSample(sampler, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT*rg.standard_normal())) for c in coils]
     curves_pert.append([c.curve for c in coils_pert])
     bs_pert = BiotSavart(coils_pert)
     Jfs.append(SquaredFlux(s, bs_pert))
@@ -377,10 +378,10 @@ for j in range(3):
         SIGMA_CURRENT_OOS = 0
     for i in range(N_OOS):
         # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
-        base_curves_perturbed = [CurvePerturbed(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
+        base_curves_perturbed = [CurvePerturbed_json(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
         coils = coils_via_symmetries(base_curves_perturbed, base_currents, s.nfp, True)
         # now add the 'statistical' error. this error is added to each of the final coils, and independent between all of them.
-        coils_pert = [Coil(CurvePerturbed(c.curve, PerturbationSample(sampler, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT_OOS*rg.standard_normal())) for c in coils]
+        coils_pert = [Coil(CurvePerturbed_json(c.curve, PerturbationSample(sampler, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT_OOS*rg.standard_normal())) for c in coils]
         # Squared Flux calculation
         bs_pert = BiotSavart(coils_pert) 
         bs_pert.set_points(s.gamma().reshape((-1, 3)))
@@ -440,4 +441,4 @@ if MPI.COMM_WORLD.rank == 0:
     with open(SUB_DIR / 'run_times.txt', 'a') as f:
                 f.write(time_taken + "\n")
             
-proc0print(f"Total time taken: {(end - start):.2f} seconds")
+proc0_print(f"Total time taken: {(end - start):.2f} seconds")

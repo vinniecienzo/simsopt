@@ -20,4 +20,4 @@ export MKL_NUM_THREADS=1  # number of threads for Intel MKL
 export PYTHONUNBUFFERED=1
 
 #run file with activated environment first
-/scratch/projects/kaptanoglulab/EL/run-simsopt.bash python stage_two_optimization_stochastic_all.py
+/scratch/projects/kaptanoglulab/EL/run-simsopt.bash python stage_two_optimization_stochastic.py
