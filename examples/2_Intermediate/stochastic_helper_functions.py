@@ -8,8 +8,9 @@ from simsopt._core.util import RealArray
 
 import simsoptpp as sopp
 from simsopt.geo.curve import Curve
+from simsopt.geo import (create_equally_spaced_curves)
 
-__all__ = ['GaussianSampler', 'PerturbationSample', 'CurvePerturbed_jsonfix']
+__all__ = ['GaussianSampler', 'PerturbationSample', 'CurvePerturbed_jsonfix', 'curve_fourier_fit']
 
 
 @dataclass
@@ -259,3 +260,72 @@ class CurvePerturbed_jsonfix(sopp.Curve, Curve):
 
     def dgammadashdashdash_by_dcoeff_vjp(self, v):
         return self.curve.dgammadashdashdash_by_dcoeff_vjp(v)
+    
+
+def curve_fourier_fit(base_curves_pert,s,order):
+ 
+    ncoils = len(base_curves_pert)
+    base_curves_fit = create_equally_spaced_curves(ncoils, s.nfp, stellsym=True, R0=0.5, R1=1.0, order=order)
+
+    theta = np.array(base_curves_fit[0].quadpoints)  # This gives you 0 to 1 (not 0 to 2π)
+    for c in range(ncoils):
+        #for each coordinate, find coefficients
+        coeffs_for_all_coords = []
+        for coordinate in range(3):
+            x = base_curves_pert[c].gamma()[:,coordinate]
+            # x = np.append(x,x[0]) #enforce periodicity for lstsq solver
+            basis = []
+            for m in range(order+1):
+                if m == 0:
+                    basis.append(np.ones_like(theta))  # Constant term (m=0)
+                else:
+                    basis.append(np.sin(2*np.pi*m*theta))  # sin(2π*m*phi) 
+                    basis.append(np.cos(2*np.pi*m*theta))  # cos(2π*m*phi)
+            A = np.column_stack(basis)
+            coeffs, _, _, _ = np.linalg.lstsq(A, x, rcond=None)
+            coeffs_for_all_coords = np.append(coeffs_for_all_coords,coeffs)
+        base_curves_fit[c].x = coeffs_for_all_coords
+
+    # Plot base curves obtained from fitted coefficients
+    # curves_to_vtk(base_curves_fit, OUT_DIR / f"base_curves_init_fit")
+    
+    #print rms error
+    # More detailed error analysis
+    fit_error = []
+    for c in range(ncoils):
+        original_points = base_curves_pert[c].gamma()
+        fitted_points = base_curves_fit[c].gamma()
+        
+        # Interpolate fitted curve to match original points for fair comparison
+        from scipy.interpolate import interp1d
+        
+        # Create parameterization for fitted curve
+        theta_fitted = np.linspace(0, 2*np.pi, fitted_points.shape[0], endpoint=False)
+        
+        # Interpolate each coordinate
+        fitted_interp = []
+        for coord in range(3):
+            f_interp = interp1d(theta_fitted, fitted_points[:, coord], kind='cubic', assume_sorted=True)
+            theta_original = np.linspace(0, 2*np.pi, original_points.shape[0], endpoint=False)
+            fitted_interp.append(f_interp(theta_original))
+        
+        fitted_interp = np.column_stack(fitted_interp)
+        
+        # Now calculate error with same number of points
+        point_errors = np.sqrt(np.sum((original_points - fitted_interp)**2, axis=1))
+        rms_error = np.sqrt(np.mean(point_errors**2))
+        
+        # Relative error
+        curve_size = np.max(np.linalg.norm(original_points, axis=1)) - np.min(np.linalg.norm(original_points, axis=1))
+        relative_error = rms_error / curve_size
+        
+        fit_error.append(rms_error)
+        
+        print(f"Coil {c}: RMS error: {rms_error:.6f}, Relative: {relative_error:.6f}")
+        print(f"Max point error: {np.max(point_errors):.6f}, Min point error: {np.min(point_errors):.6f}")
+
+    print(f"Overall fit errors: {fit_error}")
+    print(f"Mean fit error: {np.mean(fit_error):.6f}")
+
+    # return fitted curves and the mean fit error
+    return base_curves_fit, np.mean(fit_error)
