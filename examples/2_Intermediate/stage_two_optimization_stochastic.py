@@ -65,7 +65,7 @@ SIGMA, L = 1e-2, 0.5
 # Pick which configuration you want
 CONFIG_NAME = "NCSX" 
 
-RUN_MODE = 'sigma_l_scan'
+RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
@@ -126,7 +126,7 @@ MAXITER = 50 if in_github_actions else 2000
 #######################################################
 
 #load configuration
-with open("input_parameters.json") as f:
+with open("000.input_parameters.json") as f:
     all_configs = json.load(f)
 config = all_configs[CONFIG_NAME]
 globals().update(config) # Assign all keys as variables
@@ -200,11 +200,11 @@ if RUN_MODE == "pert_init":
     #fit fourier
     if fourier_fit == True: 
         base_curves, error = curve_fourier_fit(base_curves_pert, s, order)
-        
+        # show initial base coil after perturbation from fourier fit
+        curves_to_vtk(base_curves, OUT_DIR / f"base_curves_init_perturbed_ffit_{loop_label}")
     else:
         base_curves = base_curves_pert
         
-    curves_to_vtk(base_curves, OUT_DIR / f"base_curves_init_pert_{loop_label}")
 else:
     base_curves = base_curves_init
 

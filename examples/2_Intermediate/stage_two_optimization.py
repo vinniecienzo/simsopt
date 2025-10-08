@@ -56,7 +56,7 @@ SIGMA_OOS, L_OOS = 1e-2, 0.5
 # Choose and load input parameters from configuration
 CONFIG_NAME = "QH5"
 
-RUN_MODE = 'sigma_l_scan'
+RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
@@ -191,12 +191,11 @@ if RUN_MODE == "pert_init":
     #fit fourier
     if fourier_fit == True: 
         base_curves, error = curve_fourier_fit(base_curves_pert, s, order)
-        
+        # show initial base coil after perturbation from fourier fit
+        curves_to_vtk(base_curves, OUT_DIR / f"base_curves_init_perturbed_ffit_{loop_label}")
     else:
         base_curves = base_curves_pert
         
-    curves_to_vtk(base_curves, OUT_DIR / f"base_curves_init_pert_{loop_label}")
-    
 else:
     base_curves = base_curves_init
 
