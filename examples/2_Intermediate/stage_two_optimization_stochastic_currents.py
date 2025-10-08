@@ -42,7 +42,7 @@ from simsopt.objectives import QuadraticPenalty, MPIObjective, SquaredFlux
 from simsopt.util import in_github_actions, proc0_print, comm_world, curve_fourier_fit
 from simsopt.field.force import coil_force, LpCurveForce
 from simsopt.field.selffield import regularization_circ
-
+from stochastic_helper_functions import *
 
 
 start = time.time()
@@ -191,7 +191,7 @@ if RUN_MODE == "pert_init":
     
     rg_initial_guess = Generator(PCG64DXSM(seed_initial_guess))
     sampler_initial_guess = GaussianSampler(base_curves_init[0].quadpoints, SIGMA_INITIAL_GUESS, L_INITIAL_GUESS, n_derivs=2)
-    base_curves_pert = [CurvePerturbed(c, PerturbationSample(sampler_initial_guess, randomgen=rg_initial_guess)) for c in base_curves_init]
+    base_curves_pert = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler_initial_guess, randomgen=rg_initial_guess)) for c in base_curves_init]
 
     # show initial base coil after perturbation
     curves_to_vtk(base_curves_pert, OUT_DIR / f"base_curves_init_perturbed_{loop_label}")
