@@ -4,7 +4,7 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=20000
 #SBATCH --array=0-7
-#SBATCH --output=/scratch/projects/kaptanoglulab/VG/simsopt3/simsopt/examples/2_Intermediate/slurm_outputs/slurm-%A_%a.out
+#SBATCH --output=/scratch/projects/kaptanoglulab/VG/simsopt/examples/2_Intermediate/Temp_Storage/slurm-%A_%a.out
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=vmg6966@nyu.edu    
 
@@ -15,4 +15,4 @@ export MKL_NUM_THREADS=1
 export PYTHONUNBUFFERED=1
 
 # Call the wrapper, letting it launch MPI
-/scratch/projects/kaptanoglulab/EL/run-simsopt.bash mpiexec --oversubscribe -n 16 python stage_two_optimization_stochastic.py
+/scratch/projects/kaptanoglulab/VG/run-simsopt.bash mpiexec --oversubscribe -n 16 python stage_two_optimization_stochastic.py
