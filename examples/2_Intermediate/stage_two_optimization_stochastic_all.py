@@ -71,7 +71,7 @@ SIGMA_CURRENT = 1e-1 * CURRENT_BASE
 # Pick which configuration you want
 CONFIG_NAME = "NCSX_4coil" 
 
-RUN_MODE = 'pert_init'
+RUN_MODE = 'sigma_l_scan'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
@@ -121,13 +121,13 @@ else:
     raise ValueError("No run mode defined")
 
 # Out-of-sample evaluation parameters
-N_OOS = 1
+N_OOS = 1000
 SIGMA_CURVE_OOS = SIGMA_CURVE
 L_CURVE_OOS = L_CURVE
 SIGMA_CURRENT_OOS = SIGMA_CURRENT
 
 # Number of iterations to perform:
-MAXITER = 50 if in_github_actions else 2
+MAXITER = 50 if in_github_actions else 2000
 
 #######################################################
 # End of input parameters.
