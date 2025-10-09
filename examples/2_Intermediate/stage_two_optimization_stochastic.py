@@ -418,11 +418,10 @@ if MPI.COMM_WORLD.rank == 0:
     with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
         json.dump(params, f, indent=1)
         
-  end = time.time()
-    time_taken = f"Took {(end - start):.2f} for run {loop_label}."
+end = time.time()
+elapsed = end - start
+msg = f"Took {elapsed:.2f} seconds for run {loop_label}."
 
-    #Save run times
-    with open(SUB_DIR / 'run_times.txt', 'a') as f:
-                f.write(time_taken + "\n")
-            
-proc0_print(f"Total time taken: {(end - start):.2f} seconds")
+proc0_print(msg)
+with open(SUB_DIR / 'run_times.txt', 'a') as f:
+    f.write(msg + "\n")
