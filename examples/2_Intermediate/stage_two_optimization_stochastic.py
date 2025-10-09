@@ -26,6 +26,8 @@ the latter is independent for each coil.
 #srun -n 1 --ntasks-per-node=1 -c 1 -t1:30:00 --mem=100000 --pty /bin/bash
 """
 
+########################## IMPORT & INPUT SECTION ##################################
+
 import os
 import time
 from pathlib import Path
@@ -33,14 +35,15 @@ from numpy.random import PCG64DXSM, Generator
 import numpy as np
 from scipy.optimize import minimize
 from simsopt.field import BiotSavart, Current, Coil, coils_via_symmetries
-from simsopt.geo import (CurveLength, CurveCurveDistance, curves_to_vtk, create_equally_spaced_curves, SurfaceRZFourier,
-                         MeanSquaredCurvature, LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation, GaussianSampler, 
-                         CurvePerturbed, 
-                         PerturbationSample, LinkingNumber)
+from simsopt.geo import (
+    CurveLength, CurveCurveDistance, curves_to_vtk, create_equally_spaced_curves, SurfaceRZFourier,
+    MeanSquaredCurvature, LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation, GaussianSampler,
+    CurvePerturbed, PerturbationSample, LinkingNumber
+)
 from simsopt.objectives import QuadraticPenalty, MPIObjective, SquaredFlux
 from simsopt.util import in_github_actions, proc0_print, comm_world 
 import json 
-from stochastic_helper_functions import *
+
 
 start = time.time()
 
@@ -65,18 +68,28 @@ SIGMA, L = 1e-2, 0.5
 # Pick which configuration you want
 CONFIG_NAME = "NCSX" 
 
-RUN_MODE = 'pert_init'
+RUN_MODE = 'sigma_l_scan'
 
 if RUN_MODE == 'pert_init':
-    # Initial guess perturbation parameters
-    print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
-    L_INITIAL_GUESS = 0.15 # Length scale for the initial guess perturbation
-    fourier_fit = False #use curves with perturbed fourier coefficients
-    loop_label = slurm_array_int #specify what to label results for each run
-    print(loop_label)
-    seed_initial_guess = slurm_array_int #assign seed using slurm array number
-    save_param = slurm_array_int #relevant parameters to save correspond with saved data
+    SIGMA_INITIAL_GUESS = 1e-3
+    L_INITIAL_GUESS = 0.5
+    fourier_fit = False
+    # One slot per array task
+    initial_guess_ids = list(range(num_jobs))
+    # Safety check
+    if slurm_array_int >= len(initial_guess_ids):
+        raise ValueError(f"Task ID {slurm_array_int} out of range for {num_jobs} initial guesses")
+    # This task's initial guess
+    init_id = initial_guess_ids[slurm_array_int]
+    loop_label = f"init_{init_id}"
+    save_param = init_id
+
+    # Deterministic seeds (per-task; optionally unique per-rank)
+    seed_initial_guess = 4242 + init_id
+
+    if rank == 0:
+        print(f"Running initial guess #{init_id} | seed={seed_initial_guess}")
+
     
 elif RUN_MODE == 'sigma_l_scan':
     #scan sigma and L values for optimization
@@ -111,19 +124,6 @@ elif RUN_MODE == 'normal':
 else:
     #no proper run mode defined --> dont execute code
     raise ValueError("No run mode defined")
-
-    
-# Out-of-sample evaluation parameters
-N_OOS = 1000
-SIGMA_OOS = SIGMA
-L_OOS = L
-
-# Number of iterations to perform:
-MAXITER = 50 if in_github_actions else 2000
-
-#######################################################
-# End of input parameters.
-#######################################################
 
 #load configuration
 with open("000.input_parameters.json") as f:
@@ -346,6 +346,24 @@ proc0_print("""
 
 curves_to_vtk(curves, OUT_DIR / f"curves_opt_{loop_label}")
 curves_to_vtk(base_curves, OUT_DIR / f"base_curves_opt_{loop_label}")
+
+# --- make BiotSavart JSON-serializable by stripping RNG handles ---
+def _strip_rng_from_curve(curve):
+    """Remove non-serializable RNG from a CurvePerturbed's PerturbationSample."""
+    if isinstance(curve, CurvePerturbed):
+        ps = getattr(curve, "perturbation", None)
+        if ps is not None and hasattr(ps, "randomgen"):
+            ps.randomgen = None
+
+# Your 'coils' are what bs contains:
+for coil in coils:
+    _strip_rng_from_curve(coil.curve)
+
+# If you also keep 'base_curves' around as CurvePerturbed, strip there too:
+for c in base_curves:
+    _strip_rng_from_curve(c)
+
+# Now safe to save:
 bs.save(OUT_DIR / f"biot_savart_opt_{loop_label}.json")
 
 bs.set_points(s_plot.gamma().reshape((-1, 3)))

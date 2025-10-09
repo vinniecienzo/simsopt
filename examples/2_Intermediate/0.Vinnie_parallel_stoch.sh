@@ -15,4 +15,5 @@ export MKL_NUM_THREADS=1
 export PYTHONUNBUFFERED=1
 
 # Call the wrapper, letting it launch MPI
-/scratch/projects/kaptanoglulab/VG/run-simsopt.bash mpiexec --oversubscribe -n 16 python stage_two_optimization_stochastic.py
+/scratch/projects/kaptanoglulab/VG/run-simsopt.bash mpiexec --oversubscribe -n 4 python stage_two_optimization_stochastic.py
+
