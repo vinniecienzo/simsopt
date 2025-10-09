@@ -41,34 +41,89 @@ from simsopt.geo import (
     CurvePerturbed, PerturbationSample, LinkingNumber
 )
 from simsopt.objectives import QuadraticPenalty, MPIObjective, SquaredFlux
+<<<<<<< HEAD
 from simsopt.util import in_github_actions, proc0_print, comm_world 
 import json 
-
+from stochastic_helper_functions import *
 
 start = time.time()
 
 # assign slurm array job number to variable
 slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
+=======
+from simsopt.util import in_github_actions, proc0_print, comm_world
+import json
+>>>>>>> 61272bbb4 (committing changes in this branch that have errors and should be overwritten by master fetch and merge)
 
 
 #######################################################
 # Specify input parameters.
 #######################################################
+order = 16                  # Fourier modes per component
+N_SAMPLES = 4             # Monte Carlo samples
+SIGMA, L = 1e-3, 0.5        # Stochastic error params
+CONFIG_NAME = "QH5"
+RUN_MODE = 'pert_init'  #scroll down to check 
 
-# Number of Fourier modes describing each Cartesian component of each coil:
-order = 24
+# Out-of-sample evaluation parameters
+N_OOS = 1000
+SIGMA_OOS = SIGMA
+L_OOS = L
 
-# Number of samples to approximate the mean
-N_SAMPLES = 4
+# Number of iterations to perform:
+MAXITER = 50 if in_github_actions else 2000
 
-# Standard deviation for the coil errors
-# Length scale for the coil errors
-SIGMA, L = 1e-2, 0.5
+#######################################################
+# End of input parameters.
+#######################################################
 
-# Pick which configuration you want
-CONFIG_NAME = "NCSX" 
+################ START SCRIPT #########################
 
-RUN_MODE = 'sigma_l_scan'
+<<<<<<< HEAD
+RUN_MODE = 'pert_init'
+=======
+start = time.time()
+
+# ---------- SLURM array indexing ----------
+# Task index (0 if not an array run)
+slurm_array_int = int(os.getenv("SLURM_ARRAY_TASK_ID", "0"))
+
+# Array size: prefer MIN/MAX/STEP, then JOB_ARRAY_RANGE, then COUNT, else 1
+amin  = os.getenv("SLURM_ARRAY_TASK_MIN")
+amax  = os.getenv("SLURM_ARRAY_TASK_MAX")
+astep = int(os.getenv("SLURM_ARRAY_TASK_STEP", "1"))
+if amin is not None and amax is not None:
+    num_jobs = ((int(amax) - int(amin)) // astep)
+else:
+    rng = os.getenv("SLURM_JOB_ARRAY_RANGE")  # e.g. "0-19" or "0-19:2"
+    if rng:
+        a, b = rng.split("-")[0], rng.split("-")[1].split(":")[0]
+        num_jobs = int(b) - int(a) + 1
+    else:
+        num_jobs = int(os.getenv("SLURM_ARRAY_TASK_COUNT", "1"))
+
+# ---------- MPI rank detection (avoid duplicate prints) ----------
+try:
+    from mpi4py import MPI
+    rank = MPI.COMM_WORLD.Get_rank()
+    world_size = MPI.COMM_WORLD.Get_size()
+except Exception:
+    rank = 0
+    world_size = 1
+
+if rank == 0:
+    print(f"Running SLURM array task {slurm_array_int} of {num_jobs}")
+    if world_size > 1:
+        print(f"MPI world size: {world_size}")
+    
+    # Move this print INSIDE the rank==0 guard
+    print("SLURM:",
+          os.getenv("SLURM_ARRAY_TASK_ID"),
+          os.getenv("SLURM_ARRAY_TASK_MIN"),
+          os.getenv("SLURM_ARRAY_TASK_MAX"),
+          os.getenv("SLURM_ARRAY_TASK_STEP"),
+          os.getenv("SLURM_ARRAY_TASK_COUNT"))
+>>>>>>> 61272bbb4 (committing changes in this branch that have errors and should be overwritten by master fetch and merge)
 
 if RUN_MODE == 'pert_init':
     SIGMA_INITIAL_GUESS = 1e-3
