@@ -53,58 +53,58 @@ slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
 #######################################################
 
 # Number of Fourier modes describing each Cartesian component of each coil:
-order = 24
+order = 16
 
 # Number of samples to approximate the mean
 N_SAMPLES = 4
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
-SIGMA, L = 1e-2, 0.5
+SIGMA, L = 1e-3, 0.5
 
 # Pick which configuration you want
-CONFIG_NAME = "NCSX" 
+CONFIG_NAME = "QH5" 
 
 RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
-    print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
-    L_INITIAL_GUESS = 0.15 # Length scale for the initial guess perturbation
+    proc0_print("Running initial guess perturbation scan")
+    SIGMA_INITIAL_GUESS = 1e-3 # Standard deviation for the initial guess perturbation
+    L_INITIAL_GUESS = 0.5 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
-    print(loop_label)
+    proc0_print(loop_label)
     seed_initial_guess = slurm_array_int #assign seed using slurm array number
     save_param = slurm_array_int #relevant parameters to save correspond with saved data
     
 elif RUN_MODE == 'sigma_l_scan':
     #scan sigma and L values for optimization
-    print("Running sigma and l scan")
+    proc0_print("Running sigma and l scan")
     sigma_values = np.linspace(1e-3, 1e-2, 8) #sigma values to scan
     L_values = np.linspace(0.5, 0.5, 1) #L values to scan
     sigma_and_L = [(sigma, L) for sigma in sigma_values for L in L_values] #pairs of sigma and L
     SIGMA, L= sigma_and_L[slurm_array_int] #assign sigma and L using slurm array number
     loop_label = f"Sigma={SIGMA:.3f};L={L:.3f}" #specify what to label results for each run
     save_param = (SIGMA,L) #relevant parameters to save correspond with saved data
-    print(loop_label)
+    proc0_print(loop_label)
     if slurm_array_int >= len(sigma_and_L):
         raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(sigma_and_L)} orders")
     
 elif RUN_MODE == 'order_scan':
     #scan order values 
-    print("Running order scan")
+    proc0_print("Running order scan")
     order_values = [int(i) for i in range(4,36,4)] #order values to scan
     order = order_values[slurm_array_int] #assign order using slurm array number
     loop_label = f"order={order}" #specify what to label results for each run
     save_param = order #relevant parameters to save correspond with saved data
-    print(loop_label)
+    proc0_print(loop_label)
     if slurm_array_int >= len(order_values):
         raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(order_values)} orders")
     
 elif RUN_MODE == 'normal':
     #Run one optimization, no scanning
-    print("Running normal mode")
+    proc0_print("Running normal mode")
     loop_label = ""
     save_param = 0
     
@@ -248,7 +248,7 @@ rg = Generator(PCG64DXSM(seed))
 sampler = GaussianSampler(curves[0].quadpoints, SIGMA, L, n_derivs=1)
 Jfs = []
 curves_pert = []
-print("Starting N_SAMPLE LOOP")
+proc0_print("Starting N_SAMPLE LOOP")
 for i in range(N_SAMPLES):
     # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
     base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
@@ -334,7 +334,7 @@ proc0_print("""
 iteration_counter = 0
 
 res = minimize(fun, dofs, jac=True, method='L-BFGS-B', options={'maxiter': MAXITER, 'maxcor': 400}, tol=1e-15)
-print("--------------------------------JF.x shape after opt:", JF.x.shape)
+proc0_print("--------------------------------JF.x shape after opt:", JF.x.shape)
 alen_string = ", ".join([f"{np.max(c.incremental_arclength())/np.min(c.incremental_arclength())-1:.2e}" for c in base_curves])
 proc0_print(f"Final arclength variation max(|ℓ|)/min(|ℓ|) - 1=[{alen_string}]")
 
@@ -418,11 +418,11 @@ if MPI.COMM_WORLD.rank == 0:
     with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
         json.dump(params, f, indent=1)
         
-    end = time.time()
+  end = time.time()
     time_taken = f"Took {(end - start):.2f} for run {loop_label}."
 
     #Save run times
     with open(SUB_DIR / 'run_times.txt', 'a') as f:
                 f.write(time_taken + "\n")
             
-print(f"Total time taken: {(end - start):.2f} seconds")
+proc0_print(f"Total time taken: {(end - start):.2f} seconds")
