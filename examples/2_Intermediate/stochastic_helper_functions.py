@@ -13,7 +13,7 @@ from simsopt.field.coil import Current, CurrentBase
 
 
 __all__ = ['GaussianSampler', 'PerturbationSample', 'CurvePerturbed_jsonfix', 'curve_fourier_fit',
-           'CurrentPerturbed']
+           'CurrentPerturbed', 'hessian']
 
 
 @dataclass
@@ -349,3 +349,20 @@ class CurrentPerturbed(sopp.CurrentBase, CurrentBase):
     def vjp(self, v_current):
         """Pass through VJP to underlying current"""
         return self.current.vjp(v_current)
+    
+    
+def hessian(fun, dofs, eps=1e-6):
+    x = np.asarray(dofs, dtype=float)
+    n = len(x)
+    H = np.zeros((n, n))
+    for j in range(n):
+        x_fwd = x.copy()
+        x_bwd = x.copy()
+        x_fwd[j] += eps
+        x_bwd[j] -= eps
+        _, g_fwd = fun(x_fwd)
+        _, g_bwd = fun(x_bwd)
+        H[:,j] = (g_fwd - g_bwd)/(2*eps)   
+    return 0.5*(H + H.T)
+    
+    

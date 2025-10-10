@@ -60,7 +60,7 @@ CURRENT_BASE = 1e5
 SIGMA_CURRENT_OOS = 1e-1 * CURRENT_BASE
 
 # Choose and load input parameters from configuration
-CONFIG_NAME = "NCSX_4coil" 
+CONFIG_NAME = "NCSX" 
 
 RUN_MODE = 'sigma_l_scan'
 
@@ -151,7 +151,6 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 # Create the subdirectory
 SUB_DIR = OUT_DIR / "Non-VTK_Data"
 SUB_DIR.mkdir(parents=True, exist_ok=True)
-
 
 
 # Initialize the boundary magnetic surface:
@@ -278,7 +277,7 @@ def fun(dofs):
     outstr += f", C-C-Sep={Jccdist.shortest_distance():.2f}"
     outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
     last_outstr = outstr
-    print(outstr)
+    # print(outstr)
     return J, grad
 
 
@@ -299,7 +298,20 @@ for eps in [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]:
     J1, _ = f(dofs + eps*h)
     J2, _ = f(dofs - eps*h)
     print("err", (J1-J2)/(2*eps) - dJh)
+
+# print("""
+# ################################################################################
+# ### Perform a Hessian test ######################################################
+# ################################################################################
+# """)
+
+# ddJ0 = hessian(f,dofs)
+# for eps in [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]:
+#     J1, _ = f(dofs + eps*h)
+#     err = J1 - (J0 + eps*dJh + 0.5*eps**2*h.T@ddJ0@h)
+#     print("err", eps, err)
     
+
 print("""
 ################################################################################
 ### Run the optimisation #######################################################
@@ -316,6 +328,7 @@ bs.set_points(s_plot.gamma().reshape((-1, 3)))
 pointData = {"B_N": np.sum(bs.B().reshape((qphi, qtheta, 3)) * s_plot.unitnormal(), axis=2)[:, :, None]}
 s_plot.to_vtk(OUT_DIR / f"surf_opt_{loop_label}", extra_data=pointData)
 bs.set_points(s.gamma().reshape((-1, 3)))
+Jf.x = res.x
 
 curves_to_vtk(base_curves, OUT_DIR / f"base_curves_opt_{loop_label}")
 # Save the optimized coil shapes and currents so they can be loaded into other scripts for analysis:
@@ -334,6 +347,7 @@ for j in range(3):
         sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS_j1, L_CURVE_OOS, n_derivs=1)
     elif j==2:
         SIGMA_CURRENT_OOS = 0
+        sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
     for i in range(N_OOS):
         # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
         base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
@@ -351,13 +365,17 @@ for j in range(3):
         #print progress
         if (i+1) % (N_OOS/10) == 0:
             print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
-        
+
+    
 #store main results in string, print and save
 main_results_str = f"Flux Objective for exact coils    : {Jf.J():.3e}\n"
 main_results_str += f"Out-of-sample flux value                  : {np.mean(squared_flux_data):.3e}\n"
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
-
+H = hessian(fun, res.x)
+eigvals = np.linalg.eigvalsh(H)
+cond_number = abs(eigvals.max() / eigvals.min())
+main_results_str += f"Condition Number: {cond_number:.3e}\n"
 print(main_results_str)
 
 with open(SUB_DIR / 'main_results.txt', 'a') as f:
@@ -368,7 +386,8 @@ np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
          saved_parameter = save_param,
          sq_flux_value = Jf.J(),
          perturbed_sq_flux_data = squared_flux_data,
-         gradient = np.linalg.norm(JF.dJ())
+         gradient = np.linalg.norm(JF.dJ()),
+         condition_number = cond_number
          )
 
 #Save objective function values from outstr in fun() wrapper function
@@ -388,7 +407,13 @@ params = {
 
 with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
     json.dump(params, f, indent=1)
-    
+
+#save condition numbers of the hessian
+H = hessian(fun,res.x)
+eigvals = np.linalg.eigvalsh(H)
+cond_number = abs(eigvals.max() / eigvals.min())
+
+
 end = time.time()
 time_taken = f"Took {(end - start):.2f} for run {loop_label}."
 

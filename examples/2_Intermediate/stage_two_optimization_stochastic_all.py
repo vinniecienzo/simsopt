@@ -69,7 +69,7 @@ CURRENT_BASE = 1e5
 SIGMA_CURRENT = 1e-1 * CURRENT_BASE 
 
 # Pick which configuration you want
-CONFIG_NAME = "NCSX_4coil" 
+CONFIG_NAME = "NCSX" 
 
 RUN_MODE = 'sigma_l_scan'
 
@@ -312,7 +312,7 @@ def fun(dofs):
     outstr += f", Len=sum([{cl_string}])={sum(J.J() for J in Jls):.1f}, ϰ=[{kap_string}], ∫ϰ²/L>=[{msc_string}], C-C-Sep={Jccdist.shortest_distance():.2f}"
     outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
     last_outstr = outstr
-    proc0_print(outstr, flush=True)
+    # proc0_print(outstr, flush=True)
     return J, grad
 
 proc0_print("""
@@ -331,6 +331,19 @@ for eps in [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]:
     J1, _ = f(dofs + eps*h)
     J2, _ = f(dofs - eps*h)
     proc0_print("err", (J1-J2)/(2*eps) - dJh)
+    
+# proc0_print("""
+# ################################################################################
+# ### Perform a Hessian test ######################################################
+# ################################################################################
+# """)
+
+# ddJ0 = hessian(f,dofs)
+# for eps in [1e-3, 1e-4]:
+#     J1, _ = f(dofs+eps*h)
+#     err = J1 - (J0 + eps*dJ0.T*h + 0.5*eps**2*h.T@ddJ0@h)
+#     proc0_print("err", eps)
+    
 
 proc0_print("""
 ################################################################################
@@ -376,6 +389,7 @@ for j in range(3):
         sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS_j1, L_CURVE_OOS, n_derivs=1)
     elif j==2:
         SIGMA_CURRENT_OOS = 0
+        sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
     for i in range(N_OOS):
         # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
         base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
@@ -400,45 +414,48 @@ main_results_str += f"Out-of-sample flux value                  : {np.mean(squar
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Mean Flux Objective across perturbed coils: {Jmpi.J():.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
+H = hessian(fun, res.x)
+eigvals = np.linalg.eigvalsh(H)
+cond_number = abs(eigvals.max() / eigvals.min())
+main_results_str += f"Condition Number: {cond_number:.3e}\n"
 
 proc0_print(main_results_str)
-from mpi4py import MPI
-comm_world = MPI.COMM_WORLD
-if MPI.COMM_WORLD.rank == 0:
-    with open(SUB_DIR / 'main_results.txt', 'a') as f:
-        f.write(f"Run {loop_label}: \n" + main_results_str)    
 
-    #save data as array for plotting
-    np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
-            saved_parameter = save_param,
-            sq_flux_value = Jf.J(),
-            perturbed_sq_flux_data = squared_flux_data,
-            gradient = np.linalg.norm(JF.dJ())
-            )
+with open(SUB_DIR / 'main_results.txt', 'a') as f:
+    f.write(f"Run {loop_label}: \n" + main_results_str)    
 
-    #Save objective function values from outstr in fun() wrapper function
-    with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
-        f.write(f"Run {loop_label}: \n" + last_outstr)
+#save data as array for plotting
+np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
+        saved_parameter = save_param,
+        sq_flux_value = Jf.J(),
+        perturbed_sq_flux_data = squared_flux_data,
+        gradient = np.linalg.norm(JF.dJ()),
+        condition_number = cond_number
+        )
 
-    # Write input parameters to file
-    # Just specify the variable names you want
-    save_vars = ['SIGMA', 'L', 'MAXITER'
-                ]
+#Save objective function values from outstr in fun() wrapper function
+with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
+    f.write(f"Run {loop_label}: \n" + last_outstr)
 
-    # Combine both
-    params = {
-        'script_variables': {name: eval(name) for name in save_vars if name in locals() or name in globals()},
-        'json_variables': {k: v for k, v in config.items()},
-    }
+# Write input parameters to file
+# Just specify the variable names you want
+save_vars = ['SIGMA', 'L', 'MAXITER'
+            ]
 
-    with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
-        json.dump(params, f, indent=1)
-        
-    end = time.time()
-    time_taken = f"Took {(end - start):.2f} for run {loop_label}."
+# Combine both
+params = {
+    'script_variables': {name: eval(name) for name in save_vars if name in locals() or name in globals()},
+    'json_variables': {k: v for k, v in config.items()},
+}
 
-    #Save run times
-    with open(SUB_DIR / 'run_times.txt', 'a') as f:
-                f.write(time_taken + "\n")
+with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
+    json.dump(params, f, indent=1)
+    
+end = time.time()
+time_taken = f"Took {(end - start):.2f} for run {loop_label}."
+
+#Save run times
+with open(SUB_DIR / 'run_times.txt', 'a') as f:
+            f.write(time_taken + "\n")
             
 proc0_print(f"Total time taken: {(end - start):.2f} seconds")
