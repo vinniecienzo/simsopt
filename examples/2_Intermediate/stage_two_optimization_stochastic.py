@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 r"""
 In this example we solve a stochastic version of the FOCUS like Stage II coil
 optimisation problem: the goal is to find coils that generate a specific target
@@ -60,7 +58,7 @@ N_SAMPLES = 4
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
-SIGMA, L = 1e-3, 0.5
+SIGMA, L = 5e-3, 0.5
 
 # Pick which configuration you want
 CONFIG_NAME = "QH5" 
@@ -70,7 +68,7 @@ RUN_MODE = 'pert_init'
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
     proc0_print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 1e-3 # Standard deviation for the initial guess perturbation
+    SIGMA_INITIAL_GUESS = 5e-3 # Standard deviation for the initial guess perturbation
     L_INITIAL_GUESS = 0.5 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
@@ -385,43 +383,40 @@ main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
 
 proc0_print(main_results_str)
 
-proc0_print(main_results_str)
-from mpi4py import MPI
-comm_world = MPI.COMM_WORLD
-if MPI.COMM_WORLD.rank == 0:
-    with open(SUB_DIR / 'main_results.txt', 'a') as f:
-        f.write(f"Run {loop_label}: \n" + main_results_str)    
+with open(SUB_DIR / 'main_results.txt', 'a') as f:
+    f.write(f"Run {loop_label}: \n" + main_results_str)
 
-    #save data as array for plotting
-    np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
-            saved_parameter = save_param,
-            sq_flux_value = Jf.J(),
-            perturbed_sq_flux_data = squared_flux_data,
-            gradient = np.linalg.norm(JF.dJ())
-            )
+#save data as array for plotting
+np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
+         saved_parameter = save_param,
+         sq_flux_value = Jf.J(),
+         perturbed_sq_flux_data = squared_flux_data,
+         gradient = np.linalg.norm(JF.dJ())
+         )
 
-    #Save objective function values from outstr in fun() wrapper function
-    with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
-        f.write(f"Run {loop_label}: \n" + last_outstr)
+#Save objective function values from outstr in fun() wrapper function
+with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
+    f.write(f"Run {loop_label}: \n" + last_outstr + "\n")
+    
+# Write input parameters to file
+# Just specify the variable names you want
+save_vars = ['SIGMA', 'L', 'MAXITER'
+             ]
 
-    # Write input parameters to file
-    # Just specify the variable names you want
-    save_vars = ['SIGMA', 'L', 'MAXITER'
-                ]
+# Combine both
+params = {
+    'script_variables': {name: eval(name) for name in save_vars if name in locals() or name in globals()},
+    'json_variables': {k: v for k, v in config.items()},
+}
 
-    # Combine both
-    params = {
-        'script_variables': {name: eval(name) for name in save_vars if name in locals() or name in globals()},
-        'json_variables': {k: v for k, v in config.items()},
-    }
-
-    with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
-        json.dump(params, f, indent=1)
-        
+with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
+    json.dump(params, f, indent=1)
+    
 end = time.time()
-elapsed = end - start
-msg = f"Took {elapsed:.2f} seconds for run {loop_label}."
+time_taken = f"Took {(end - start):.2f} for run {loop_label}."
 
-proc0_print(msg)
+#Save run times
 with open(SUB_DIR / 'run_times.txt', 'a') as f:
-    f.write(msg + "\n")
+            f.write(time_taken + "\n")
+            
+proc0_print(time_taken)

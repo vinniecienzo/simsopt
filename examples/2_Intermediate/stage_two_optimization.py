@@ -35,7 +35,7 @@ from simsopt.geo import (SurfaceRZFourier, curves_to_vtk, create_equally_spaced_
                          GaussianSampler, CurvePerturbed,
                          PerturbationSample, LinkingNumber) # CurrentPerturbed removed should not affect EW1
 from simsopt.objectives import Weight, SquaredFlux, QuadraticPenalty
-from simsopt.util import in_github_actions
+from simsopt.util import in_github_actions,proc0_print, comm_world 
 from stochastic_helper_functions import *
 
 start = time.time()
@@ -44,14 +44,14 @@ start = time.time()
 slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
 
 # Number of Fourier modes describing each Cartesian component of each coil:
-order = 24
+order = 16
 
 # Number of samples for out-of-sample evaluation
 N_OOS = 1000
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
-SIGMA_OOS, L_OOS = 1e-2, 0.5
+SIGMA_OOS, L_OOS = 5e-3, 0.5
 
 # Choose and load input parameters from configuration
 CONFIG_NAME = "QH5"
@@ -60,18 +60,18 @@ RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
-    print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
-    L_INITIAL_GUESS = 0.15 # Length scale for the initial guess perturbation
+    proc0_print("Running initial guess perturbation scan")
+    SIGMA_INITIAL_GUESS = 5e-3 # Standard deviation for the initial guess perturbation
+    L_INITIAL_GUESS = 0.5 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
-    print(loop_label)
+    proc0_print(loop_label)
     seed_initial_guess = slurm_array_int #assign seed using slurm array number
     save_param = slurm_array_int #relevant parameters to save correspond with saved data
         
 elif RUN_MODE == 'sigma_l_scan':
     #scan sigma and L values for optimization
-    print("Running sigma and l scan")
+    proc0_print("Running sigma and l scan")
     sigma_values = np.linspace(1e-3, 1e-2, 8) #sigma values to scan
     L_values = np.linspace(0.5, 0.5, 1) #L values to scan
     sigma_and_L = [(sigma, L) for sigma in sigma_values for L in L_values] #pairs of sigma and L
@@ -82,22 +82,22 @@ elif RUN_MODE == 'sigma_l_scan':
     SIGMA_OOS, L_OOS = sigma_and_L[slurm_array_int] #assign sigma and L using slurm array number
     loop_label = slurm_array_int #specify what to label results for each run
     save_param = (SIGMA_OOS,L_OOS) #relevant parameters to save correspond with saved data
-    print(loop_label)
+    proc0_print(loop_label)
     
 elif RUN_MODE == 'order_scan':
     #scan order values 
-    print("Running order scan")
+    proc0_print("Running order scan")
     order_values = [int(i) for i in range(4,36,4)] #order values to scan
     order = order_values[slurm_array_int] #assign order using slurm array number
     loop_label = f"order={order}" #specify what to label results for each run
     save_param = order #relevant parameters to save to correspond with saved data
-    print(loop_label)
+    proc0_print(loop_label)
     if slurm_array_int >= len(order_values):
         raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(order_values)} orders")
 
 elif RUN_MODE == 'normal':
     #Run one optimization, no scanning
-    print("Running normal mode")
+    proc0_print("Running normal mode")
     loop_label = ""
     save_param = 0
     
@@ -270,11 +270,11 @@ def fun(dofs):
     outstr += f", C-C-Sep={Jccdist.shortest_distance():.2f}"
     outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
     last_outstr = outstr
-    print(outstr)
+    proc0_print(outstr)
     return J, grad
 
 
-print("""
+proc0_print("""
 ################################################################################
 ### Perform a Taylor test ######################################################
 ################################################################################
@@ -290,9 +290,9 @@ dJh = sum(dJ0 * h)
 for eps in [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]:
     J1, _ = f(dofs + eps*h)
     J2, _ = f(dofs - eps*h)
-    print("err", (J1-J2)/(2*eps) - dJh)
+    proc0_print("err", (J1-J2)/(2*eps) - dJh)
     
-print("""
+proc0_print("""
 ################################################################################
 ### Run the optimisation #######################################################
 ################################################################################
@@ -336,7 +336,7 @@ for i in range(N_OOS):
         curves_to_vtk(curves_pert_oos[i], OUT_DIR / f"curves_pert_oos_{loop_label}_sample_{i}")
     #print progress
     if (i+1) % (N_OOS/10) == 0:
-        print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
+        proc0_print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
         
 
 
@@ -346,7 +346,7 @@ main_results_str += f"Out-of-sample flux value                  : {np.mean(squar
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
 
-print(main_results_str)
+proc0_print(main_results_str)
 
 with open(SUB_DIR / 'main_results.txt', 'a') as f:
     f.write(f"Run {loop_label}: \n" + main_results_str)
@@ -384,4 +384,4 @@ time_taken = f"Took {(end - start):.2f} for run {loop_label}."
 with open(SUB_DIR / 'run_times.txt', 'a') as f:
             f.write(time_taken + "\n")
             
-print(f"Took {end-start}s")
+proc0_print(f"Took {end-start}s")

@@ -9,7 +9,7 @@ from .._core.util import RealArray
 import simsoptpp as sopp
 from simsopt.geo.curve import Curve
 
-__all__ = ['GaussianSampler', 'PerturbationSample', 'CurvePerturbed']
+__all__ = ['GaussianSampler', 'PerturbationSample', 'CurvePerturbed_json_fix']
 
 
 @dataclass
@@ -110,12 +110,27 @@ class PerturbationSample(GSONable):
     def __init__(self, sampler, randomgen=None, sample=None):
         self.sampler = sampler
         self.randomgen = randomgen   # If not None, most likely fail with serialization
+        # Store generator state for serialization
+        if randomgen is not None:
+            self._generator_state = randomgen.bit_generator.state
+            self._generator_type = type(randomgen.bit_generator).__name__
+        else:
+            self._generator_state = None
+            self._generator_type = None
         if sample:
             self._sample = sample
         else:
             self.resample()
 
     def resample(self):
+        # Reconstruct generator if needed for resampling
+        if self.randomgen is None and self._generator_state is not None:
+            if self._generator_type == 'PCG64DXSM':
+                from numpy.random import PCG64DXSM, Generator
+                bit_gen = PCG64DXSM()
+                bit_gen.state = self._generator_state
+                self.randomgen = Generator(bit_gen)
+            # Add other generator types as needed
         self._sample = self.sampler.draw_sample(self.randomgen)
 
     def __getitem__(self, deriv):
@@ -124,14 +139,51 @@ class PerturbationSample(GSONable):
         """
         assert isinstance(deriv, int)
         if deriv >= len(self._sample):
-            raise ValueError("""
-The sample on has {len(self._sample)-1} derivatives.
+            raise ValueError(f"""
+The sample only has {len(self._sample)-1} derivatives.
 Adjust the `n_derivs` parameter of the sampler to access higher derivatives.
 """)
         return self._sample[deriv]
 
+    def as_dict(self, serial_objs_dict):
+        """Custom serialization to handle random generator state."""
+        d = super().as_dict(serial_objs_dict)
+        # Store generator state instead of generator object
+        if hasattr(self, '_generator_state'):
+            d['_generator_state'] = self._generator_state
+            d['_generator_type'] = self._generator_type
+        # Don't serialize the randomgen object itself
+        if 'randomgen' in d:
+            del d['randomgen']
+        return d
 
-class CurvePerturbed(sopp.Curve, Curve):
+    @classmethod
+    def from_dict(cls, d, serial_objs_dict, recon_objs):
+        """Custom deserialization to reconstruct random generator state."""
+        # Extract generator state info before calling parent constructor
+        generator_state = d.get('_generator_state')
+        generator_type = d.get('_generator_type')
+        
+        # Create a clean dict without generator attributes for parent constructor
+        clean_d = {k: v for k, v in d.items() if not k.startswith('_generator_')}
+        
+        obj = super().from_dict(clean_d, serial_objs_dict, recon_objs)
+        
+        # Set generator state attributes after construction
+        if generator_state is not None:
+            obj._generator_state = generator_state
+            obj._generator_type = generator_type
+            # Reconstruct generator if state was stored
+            if generator_type == 'PCG64DXSM':
+                from numpy.random import PCG64DXSM, Generator
+                bit_gen = PCG64DXSM()
+                bit_gen.state = generator_state
+                obj.randomgen = Generator(bit_gen)
+        
+        return obj
+
+
+class CurvePerturbed_json_fix(sopp.Curve, Curve):
 
     """A perturbed curve."""
 
