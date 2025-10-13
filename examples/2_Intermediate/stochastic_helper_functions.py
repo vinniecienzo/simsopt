@@ -13,7 +13,7 @@ from simsopt.field.coil import Current, CurrentBase
 
 
 __all__ = ['GaussianSampler', 'PerturbationSample', 'CurvePerturbed_jsonfix', 'curve_fourier_fit',
-           'CurrentPerturbed', 'hessian']
+           'CurrentPerturbed', 'CentroidPerturbed', 'hessian', 'mpi_hessian']
 
 
 @dataclass
@@ -264,7 +264,26 @@ class CurvePerturbed_jsonfix(sopp.Curve, Curve):
     def dgammadashdashdash_by_dcoeff_vjp(self, v):
         return self.curve.dgammadashdashdash_by_dcoeff_vjp(v)
     
+class CentroidPerturbed(sopp.Curve, Curve):
+    def __init__(self, curve, sample):
+        r"""
 
+        """
+        self.curve = curve
+        sopp.Curve.__init__(self, curve.quadpoints)
+        Curve.__init__(self, depends_on=[curve])
+        sample_direc, self.sample_amount = sample #given as rg.standard_normal(3), SIGMA_CENTROID*rg.standard_normal(); plan on cleaning this at some point
+        self.sample_direc = sample_direc / np.linalg.norm(sample_direc)
+        
+    def gamma_impl(self, gamma, quadpoints):
+        assert quadpoints.shape[0] == self.curve.quadpoints.shape[0]
+        assert np.linalg.norm(quadpoints - self.curve.quadpoints) < 1e-15
+        gamma[:] = self.curve.gamma() + self.sample_direc*self.sample_amount
+        
+    def dgamma_by_dcoeff_vjp(self, v):
+        return self.curve.dgamma_by_dcoeff_vjp(v)
+
+    
 def curve_fourier_fit(base_curves_pert,s,order):
  
     ncoils = len(base_curves_pert)
@@ -349,7 +368,7 @@ class CurrentPerturbed(sopp.CurrentBase, CurrentBase):
     def vjp(self, v_current):
         """Pass through VJP to underlying current"""
         return self.current.vjp(v_current)
-    
+
     
 def hessian(fun, dofs, eps=1e-6):
     x = np.asarray(dofs, dtype=float)
@@ -364,5 +383,60 @@ def hessian(fun, dofs, eps=1e-6):
         _, g_bwd = fun(x_bwd)
         H[:,j] = (g_fwd - g_bwd)/(2*eps)   
     return 0.5*(H + H.T)
+
+
+import numpy as np
+from mpi4py import MPI
+from simsopt._core.util import parallel_loop_bounds
+
+
+def mpi_hessian(fun, dofs, comm, eps=1e-6):
+    """
+    Computes the Hessian matrix of a function in parallel using MPI.
+
+    The calculation of the columns of the Hessian is distributed among MPI ranks.
+
+    Args:
+        fun: A function that returns a tuple (value, gradient) for a given input.
+        dofs: The point (degrees of freedom) at which to evaluate the Hessian.
+        comm: The MPI communicator to use for parallelization.
+        eps: The step size for the finite difference approximation.
+
+    Returns:
+        The symmetric Hessian matrix.
+    """
+    rank = comm.Get_rank()
+    print(f"rank {rank} func called")
+    x = np.asarray(dofs, dtype=float)
+    n = len(x)
+    
+    # Initialize a local Hessian matrix with zeros. Each rank will fill
+    # in only its assigned columns.
+    H_local = np.zeros((n, n))
+
+    # Determine which columns this MPI rank is responsible for
+    start_idx, end_idx = parallel_loop_bounds(comm, n)
+
+    # Each rank computes its subset of the columns
+    for j in range(start_idx, end_idx):
+        x_fwd = x.copy()
+        x_bwd = x.copy()
+        x_fwd[j] += eps
+        x_bwd[j] -= eps
+        
+        _, g_fwd = fun(x_fwd)
+        _, g_bwd = fun(x_bwd)
+        
+        H_local[:, j] = (g_fwd - g_bwd) / (2 * eps)
+    print(f"rank {rank} loop done")
+    # Use Allreduce to sum the partial Hessian matrices from all ranks.
+    # Each rank contributes its computed columns, and MPI.SUM assembles
+    # the final matrix, which is then available on all ranks.
+    H_global = np.zeros_like(H_local)
+    comm.Allreduce(H_local, H_global, op=MPI.SUM)
+
+    # Symmetrize the result to improve accuracy
+    return 0.5 * (H_global + H_global.T)
+
     
     

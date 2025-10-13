@@ -49,7 +49,8 @@ start = time.time()
 
 # assign slurm array job number to variable
 slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
-
+job_id = int(os.environ.get("SLURM_JOB_ID", 0))
+proc0_print(f"SLURM job ID: {job_id}")
 
 #######################################################
 # Specify input parameters.
@@ -59,7 +60,7 @@ slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
 order = 24
 
 # Number of samples to approximate the mean
-N_SAMPLES = 4
+N_SAMPLES = 200
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
@@ -67,52 +68,65 @@ N_SAMPLES = 4
 SIGMA_CURVE, L_CURVE = 1e-2, 0.5
 CURRENT_BASE = 1e5
 SIGMA_CURRENT = 1e-1 * CURRENT_BASE 
+SIGMA_CENTROID = 1e-2
+
+PERT_CURRENT = True
+PERT_CURVE = True
+PERT_CENTROID = False
 
 # Pick which configuration you want
 CONFIG_NAME = "NCSX" 
 
-RUN_MODE = 'sigma_l_scan'
+RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
-    print("Running initial guess perturbation scan")
+    proc0_print("Running initial guess perturbation scan")
     SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
     L_INITIAL_GUESS = 0.15 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
-    print(loop_label)
+    proc0_print(loop_label)
     seed_initial_guess = slurm_array_int #assign seed using slurm array number
     save_param = slurm_array_int #relevant parameters to save correspond with saved data
     
 elif RUN_MODE == 'sigma_l_scan':
     #scan sigma and L values for optimization
-    print("Running sigma and l scan")
+    proc0_print("Running sigma and l scan")
     sigma_curves_values = np.linspace(1e-3, 1e-2, 8) #sigma values to scan
     L_curves_values = np.linspace(0.5, 0.5, 1) #L values to scan
     sigma_and_L_curves = [(sigma, L) for sigma in sigma_curves_values for L in L_curves_values] #pairs of sigma and L
     SIGMA_CURVE , L_CURVE = sigma_and_L_curves[slurm_array_int] #assign sigma and L using slurm array number
     sigma_current_values = np.linspace(1e-2, 1e-1, 8) * CURRENT_BASE
     SIGMA_CURRENT = sigma_current_values[slurm_array_int]
-    loop_label = f"Sigma_curve={SIGMA_CURVE:.3f};L_curve={L_CURVE:.3f},Sigma_current={SIGMA_CURRENT:.3f}" #specify what to label results for each run
-    save_param = (SIGMA_CURVE,L_CURVE,SIGMA_CURRENT) #relevant parameters to save correspond with saved data
-    print(loop_label)
+    if PERT_CURRENT and PERT_CURVE:
+        loop_label = f"Sigma_curve={SIGMA_CURVE:.3f};L_curve={L_CURVE:.3f},Sigma_current={SIGMA_CURRENT:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURVE,L_CURVE,SIGMA_CURRENT) #relevant parameters to save correspond with saved data
+    elif PERT_CURRENT:
+        loop_label = f"Sigma_current={SIGMA_CURRENT:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURRENT) #relevant parameters to save correspond with saved data
+    elif PERT_CURVE:
+        loop_label = f"Sigma_curve={SIGMA_CURVE:.3f};L_curve={L_CURVE:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURVE,L_CURVE) #relevant parameters to save correspond with saved data
+        
+    proc0_print(loop_label)
     if slurm_array_int >= len(sigma_and_L_curves):
         raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(sigma_and_L_curves)} orders")
     
 elif RUN_MODE == 'order_scan':
     #scan order values 
-    print("Running order scan")
+    proc0_print("Running order scan")
     order_values = [int(i) for i in range(4,36,4)] #order values to scan
     order = order_values[slurm_array_int] #assign order using slurm array number
     loop_label = f"order={order}" #specify what to label results for each run
     save_param = order #relevant parameters to save correspond with saved data
-    print(loop_label)
+    proc0_print(loop_label)
     if slurm_array_int >= len(order_values):
         raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(order_values)} orders")
     
 elif RUN_MODE == 'normal':
     #Run one optimization, no scanning
-    print("Running normal mode")
+    proc0_print("Running normal mode")
     loop_label = ""
     save_param = 0
     
@@ -120,11 +134,16 @@ else:
     #no proper run mode defined --> dont execute code
     raise ValueError("No run mode defined")
 
+SIGMA_CURRENT = SIGMA_CURRENT if PERT_CURRENT else 0
+SIGMA_CURVE = SIGMA_CURVE if PERT_CURVE else 0
+SIGMA_CENTROID = SIGMA_CENTROID if PERT_CENTROID else 0
+
 # Out-of-sample evaluation parameters
 N_OOS = 1000
 SIGMA_CURVE_OOS = SIGMA_CURVE
 L_CURVE_OOS = L_CURVE
 SIGMA_CURRENT_OOS = SIGMA_CURRENT
+SIGMA_CENTROID_OOS = SIGMA_CENTROID
 
 # Number of iterations to perform:
 MAXITER = 50 if in_github_actions else 2000
@@ -148,7 +167,13 @@ TEST_DIR = (Path(__file__).parent / ".." / ".." / "tests" / "test_files").resolv
 surf_filename = TEST_DIR / config["surface_filename"]
 
 # Directory for output
-out_dir_path = f"output_stage_two_optimization_stochastic_all_{CONFIG_NAME}_{N_SAMPLES}nsamp_{RUN_MODE}_"
+out_dir_path = f"output_stage_two_optimization_stochastic_{CONFIG_NAME}_{N_SAMPLES}nsamp_{RUN_MODE}"
+if PERT_CURRENT and PERT_CURVE:
+    out_dir_path += "_all"
+elif PERT_CURRENT:
+    out_dir_path += "_currents"
+elif PERT_CURVE:
+    out_dir_path += "_curves"
 
 if RUN_MODE == 'pert_init':
     if fourier_fit == True:
@@ -156,7 +181,7 @@ if RUN_MODE == 'pert_init':
     
 if MAXITER != 2000:
     out_dir_path += f"_{MAXITER/1000}kiter"
-
+proc0_print(out_dir_path)
 OUT_DIR = Path(out_dir_path)
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -197,7 +222,6 @@ curves_to_vtk(base_curves_init, OUT_DIR / f"base_curves_init")
 # Perturb coils
 if RUN_MODE == "pert_init":
     
-
     rg_initial_guess = Generator(PCG64DXSM(seed_initial_guess))
     sampler_initial_guess = GaussianSampler(base_curves_init[0].quadpoints, SIGMA_INITIAL_GUESS, L_INITIAL_GUESS, n_derivs=2)
     base_curves_pert = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler_initial_guess, randomgen=rg_initial_guess)) for c in base_curves_init]
@@ -228,7 +252,6 @@ base_currents[0].fix_all()
 # base_currents += [total_current - sum(base_currents)]
 
 coils = coils_via_symmetries(base_curves, base_currents, s.nfp, True)
-
 bs = BiotSavart(coils)
 
 curves = [c.curve for c in coils]
@@ -256,13 +279,17 @@ rg = Generator(PCG64DXSM(seed))
 sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE, L_CURVE, n_derivs=1)
 Jfs = []
 curves_pert = []
-print("Starting N_SAMPLE LOOP")
+proc0_print("Starting N_SAMPLE LOOP")
+
 for i in range(N_SAMPLES):
     # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
     base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
+    # base_curves_centroid_perturbed = [CentroidPerturbed(c,(rg.standard_normal(3),SIGMA_CENTROID*rg.standard_normal())) for c in base_curves_perturbed]
     coils = coils_via_symmetries(base_curves_perturbed, base_currents, s.nfp, True)
+    #coils = coils_via_symmetries(base_curves_centroid_perturbed, base_currents, s.nfp, True)
     # now add the 'statistical' error. this error is added to each of the final coils, and independent between all of them.
     coils_pert = [Coil(CurvePerturbed_jsonfix(c.curve, PerturbationSample(sampler, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT*rg.standard_normal())) for c in coils]
+    #coils_centroid_pert = [Coil(CentroidPerturbed(c.curve,(rg.standard_normal(3),SIGMA_CENTROID*rg.standard_normal())),c.current) for c in coils_pert]
     curves_pert.append([c.curve for c in coils_pert])
     bs_pert = BiotSavart(coils_pert)
     Jfs.append(SquaredFlux(s, bs_pert))
@@ -286,7 +313,7 @@ JF = Jmpi \
     + MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs) \
     + ARCLENGTH_WEIGHT * sum(Jals) \
     + CS_WEIGHT * Jcsdist \
-    + linkNum
+    + LINK_WEIGHT * linkNum
     
 
 # We don't have a general interface in SIMSOPT for optimisation problems that
@@ -313,6 +340,7 @@ def fun(dofs):
     outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
     last_outstr = outstr
     # proc0_print(outstr, flush=True)
+    print(Jmpi.x[:10])
     return J, grad
 
 proc0_print("""
@@ -331,19 +359,24 @@ for eps in [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]:
     J1, _ = f(dofs + eps*h)
     J2, _ = f(dofs - eps*h)
     proc0_print("err", (J1-J2)/(2*eps) - dJh)
-    
+
+# start_hess = time.time()
 # proc0_print("""
 # ################################################################################
-# ### Perform a Hessian test ######################################################
+# ### Perform a Hessian test######################################################
 # ################################################################################
 # """)
 
-# ddJ0 = hessian(f,dofs)
-# for eps in [1e-3, 1e-4]:
+# ddJ0 = hessian(f, dofs)
+# print("done with mpi hessian calc")
+# for eps in [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]:
 #     J1, _ = f(dofs+eps*h)
-#     err = J1 - (J0 + eps*dJ0.T*h + 0.5*eps**2*h.T@ddJ0@h)
-#     proc0_print("err", eps)
+#     err = J1 - (J0 + eps*dJh + 0.5*eps**2*h.T@ddJ0@h)
+#     proc0_print("err", eps, err)
     
+# end_hess = time.time()
+# proc0_print(f"time to run hessian test {end_hess - start_hess}")
+
 
 proc0_print("""
 ################################################################################
@@ -355,7 +388,7 @@ proc0_print("""
 iteration_counter = 0
 
 res = minimize(fun, dofs, jac=True, method='L-BFGS-B', options={'maxiter': MAXITER, 'maxcor': 400}, tol=1e-15)
-print("--------------------------------JF.x shape after opt:", JF.x.shape)
+proc0_print("--------------------------------JF.x shape after opt:", JF.x.shape)
 alen_string = ", ".join([f"{np.max(c.incremental_arclength())/np.min(c.incremental_arclength())-1:.2e}" for c in base_curves])
 proc0_print(f"Final arclength variation max(|ℓ|)/min(|ℓ|) - 1=[{alen_string}]")
 
@@ -364,6 +397,7 @@ proc0_print("""
 ### Evaluate the obtained coils ################################################
 ################################################################################
 """)
+
 
 curves_to_vtk(curves, OUT_DIR / f"curves_opt_{loop_label}")
 curves_to_vtk(base_curves, OUT_DIR / f"base_curves_opt_{loop_label}")
@@ -380,9 +414,10 @@ Jf.x = res.x
 rg = Generator(PCG64DXSM(seed+1))
 sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
 b_dot_n_pert = np.zeros((qphi, qtheta)) 
-squared_flux_data = [[],[],[]]
+squared_flux_data = [[],[],[]] if SIGMA_CURVE_OOS !=0 and SIGMA_CURRENT_OOS!=0 else [[]]
 curves_pert_oos = []
-for j in range(3):
+perturbation_number = 3 if SIGMA_CURVE_OOS !=0 and SIGMA_CURRENT_OOS!=0 else 1
+for j in range(perturbation_number):
     #perturb curves and currents, then currents only, then curves only
     if j==1:
         SIGMA_CURVE_OOS_j1 = 0
@@ -393,9 +428,12 @@ for j in range(3):
     for i in range(N_OOS):
         # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
         base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
+        # base_curves_centroid_perturbed = [CentroidPerturbed(c,(rg.standard_normal(3),SIGMA_CENTROID*rg.standard_normal())) for c in base_curves_perturbed]
         coils = coils_via_symmetries(base_curves_perturbed, base_currents, s.nfp, True)
+        #coils = coils_via_symmetries(base_curves_centroid_perturbed, base_currents, s.nfp, True)
         # now add the 'statistical' error. this error is added to each of the final coils, and independent between all of them.
-        coils_pert = [Coil(CurvePerturbed_jsonfix(c.curve, PerturbationSample(sampler, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT_OOS*rg.standard_normal())) for c in coils]
+        coils_pert = [Coil(CurvePerturbed_jsonfix(c.curve, PerturbationSample(sampler, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT*rg.standard_normal())) for c in coils]
+        #coils_centroid_pert = [Coil(CentroidPerturbed(c.curve,(rg.standard_normal(3),SIGMA_CENTROID_OOS*rg.standard_normal())),c.current) for c in coils_pert]
         # Squared Flux calculation
         bs_pert = BiotSavart(coils_pert) 
         bs_pert.set_points(s.gamma().reshape((-1, 3)))
@@ -406,23 +444,21 @@ for j in range(3):
             curves_to_vtk(curves_pert_oos[-1], OUT_DIR / f"curves_pert_oos_{loop_label}_sample_{i}")
         #print progress
         if (i+1) % (N_OOS/10) == 0:
-            print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
+            proc0_print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
         
 #store main results in string, print and save
 main_results_str = f"Flux Objective for exact coils     : {Jf.J():.3e}\n"
-main_results_str += f"Out-of-sample flux value                  : {np.mean(squared_flux_data):.3e}\n"
+main_results_str += f"Out-of-sample flux value                  : {np.mean(squared_flux_data[0]):.3e}\n"
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Mean Flux Objective across perturbed coils: {Jmpi.J():.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
 H = hessian(fun, res.x)
-eigvals = np.linalg.eigvalsh(H)
-cond_number = abs(eigvals.max() / eigvals.min())
-main_results_str += f"Condition Number: {cond_number:.3e}\n"
+hessian_norm = np.linalg.norm(H, 2)
+hessian_cond = np.linalg.cond(H, 2)
 
+main_results_str += f"Condition Number: {hessian_cond:.3e}\n"
+main_results_str += f"Condition Number: {hessian_norm:.3e}\n"
 proc0_print(main_results_str)
-
-with open(SUB_DIR / 'main_results.txt', 'a') as f:
-    f.write(f"Run {loop_label}: \n" + main_results_str)    
 
 #save data as array for plotting
 np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
@@ -430,32 +466,39 @@ np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
         sq_flux_value = Jf.J(),
         perturbed_sq_flux_data = squared_flux_data,
         gradient = np.linalg.norm(JF.dJ()),
-        condition_number = cond_number
+        hessian_condition_number = hessian_cond,
+        hessian_norm = hessian_norm,
+        
         )
 
-#Save objective function values from outstr in fun() wrapper function
-with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
-    f.write(f"Run {loop_label}: \n" + last_outstr)
+from mpi4py import MPI
+comm_world = MPI.COMM_WORLD
+if MPI.COMM_WORLD.rank == 0:
+    with open(SUB_DIR / 'main_results.txt', 'a') as f:
+        f.write(f"Run {loop_label}: \n" + main_results_str)   
+    #Save objective function values from outstr in fun() wrapper function
+    with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
+        f.write(f"Run {loop_label}: \n" + last_outstr)
 
-# Write input parameters to file
-# Just specify the variable names you want
-save_vars = ['SIGMA', 'L', 'MAXITER'
-            ]
+    # Write input parameters to file
+    # Just specify the variable names you want
+    save_vars = ['SIGMA', 'L', 'MAXITER'
+                ]
 
-# Combine both
-params = {
-    'script_variables': {name: eval(name) for name in save_vars if name in locals() or name in globals()},
-    'json_variables': {k: v for k, v in config.items()},
-}
+    # Combine both
+    params = {
+        'script_variables': {name: eval(name) for name in save_vars if name in locals() or name in globals()},
+        'json_variables': {k: v for k, v in config.items()},
+    }
 
-with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
-    json.dump(params, f, indent=1)
-    
-end = time.time()
-time_taken = f"Took {(end - start):.2f} for run {loop_label}."
+    with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
+        json.dump(params, f, indent=1)
+        
+    end = time.time()
+    time_taken = f"Took {(end - start):.2f} for run {loop_label}."
 
-#Save run times
-with open(SUB_DIR / 'run_times.txt', 'a') as f:
-            f.write(time_taken + "\n")
+    #Save run times
+    with open(SUB_DIR / 'run_times.txt', 'a') as f:
+                f.write(time_taken + "\n")
             
-proc0_print(f"Total time taken: {(end - start):.2f} seconds")
+    proc0_print(f"Total time taken: {(end - start):.2f} seconds")

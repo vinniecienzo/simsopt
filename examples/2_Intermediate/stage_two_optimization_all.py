@@ -44,6 +44,8 @@ start = time.time()
 
 # assign slurm array job number to variable
 slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
+job_id = int(os.environ.get("SLURM_JOB_ID", 0))
+print(f"SLURM job ID: {job_id}")
 
 # Number of Fourier modes describing each Cartesian component of each coil:
 order = 24
@@ -58,17 +60,21 @@ SIGMA_CURVE_OOS, L_CURVE_OOS = 1e-2, 0.5
 
 CURRENT_BASE = 1e5
 SIGMA_CURRENT_OOS = 1e-1 * CURRENT_BASE
+SIGMA_CENTROID_OOS = 1e-2
 
+PERT_CURRENT = True
+PERT_CURVE = True
+PERT_CENTROID = True
 # Choose and load input parameters from configuration
-CONFIG_NAME = "NCSX" 
+CONFIG_NAME = "QH5" 
 
-RUN_MODE = 'sigma_l_scan'
+RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
     print("Running initial guess perturbation scan")
     SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
-    L_INITIAL_GUESS = 0.15 # Length scale for the initial guess perturbation
+    L_INITIAL_GUESS = 0.2 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
     print(loop_label)
@@ -111,7 +117,9 @@ else:
     #no proper run mode defined --> dont execute code
     raise ValueError("No run mode defined")
 
-
+SIGMA_CURRENT_OOS = SIGMA_CURRENT_OOS if PERT_CURRENT else 0
+SIGMA_CURVE_OOS = SIGMA_CURVE_OOS if PERT_CURVE else 0
+SIGMA_CENTROID_OOS = SIGMA_CENTROID_OOS if PERT_CENTROID else 0
 # Number of iterations to perform:
 MAXITER = 50 if in_github_actions else 1000
 
@@ -135,15 +143,21 @@ TEST_DIR = (Path(__file__).parent / ".." / ".." / "tests" / "test_files").resolv
 filename = TEST_DIR / config["surface_filename"]
 
 # Directory for output
-out_dir_path = f"output_stage_two_optimization_all_{CONFIG_NAME}_{RUN_MODE}"
+out_dir_path = f"output_stage_two_optimization_{CONFIG_NAME}_{RUN_MODE}"
 
+if PERT_CURRENT and PERT_CURVE:
+    out_dir_path += "_all"
+elif PERT_CURRENT:
+    out_dir_path += "_currents"
+elif PERT_CURVE:
+    out_dir_path += "_curves"
 if RUN_MODE == 'pert_init':
     if fourier_fit == True:
         out_dir_path += "_ffit"
     
 if MAXITER != 1000:
     out_dir_path += f"_{MAXITER/1000}kiter"
-    
+print(out_dir_path)
 OUT_DIR = Path(out_dir_path)
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -336,11 +350,12 @@ bs.save(OUT_DIR / "biot_savart_opt.json")
 
 #Perturb coils
 seed = 0
-squared_flux_data = [[],[],[]]
+squared_flux_data = [[],[],[]] if SIGMA_CURVE_OOS !=0 and SIGMA_CURRENT_OOS!=0 else [[]]
 curves_pert_oos = []
 rg = Generator(PCG64DXSM(seed+1))
 sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
-for j in range(3):
+perturbation_number = 3 if SIGMA_CURVE_OOS !=0 and SIGMA_CURRENT_OOS!=0 else 1
+for j in range(perturbation_number):
     #perturb curves and currents, then currents only, then curves only
     if j==1:
         SIGMA_CURVE_OOS_j1 = 0
@@ -351,9 +366,12 @@ for j in range(3):
     for i in range(N_OOS):
         # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
         base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
+        # base_curves_centroid_perturbed = [CentroidPerturbed(c,(rg.standard_normal(3),SIGMA_CENTROID*rg.standard_normal())) for c in base_curves_perturbed]
         coils = coils_via_symmetries(base_curves_perturbed, base_currents, s.nfp, True)
+        #coils = coils_via_symmetries(base_curves_centroid_perturbed, base_currents, s.nfp, True)
         # now add the 'statistical' error. this error is added to each of the final coils, and independent between all of them.
         coils_pert = [Coil(CurvePerturbed_jsonfix(c.curve, PerturbationSample(sampler, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT_OOS*rg.standard_normal())) for c in coils]
+        #coils_centroid_pert = [Coil(CentroidPerturbed(c.curve,(rg.standard_normal(3),SIGMA_CENTROID_OOS*rg.standard_normal())),c.current) for c in coils_pert]
         # Squared Flux calculation
         bs_pert = BiotSavart(coils_pert) 
         bs_pert.set_points(s.gamma().reshape((-1, 3)))
@@ -373,9 +391,11 @@ main_results_str += f"Out-of-sample flux value                  : {np.mean(squar
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
 H = hessian(fun, res.x)
-eigvals = np.linalg.eigvalsh(H)
-cond_number = abs(eigvals.max() / eigvals.min())
-main_results_str += f"Condition Number: {cond_number:.3e}\n"
+hessian_norm = np.linalg.norm(H, 2)
+hessian_cond = np.linalg.cond(H, 2)
+
+main_results_str += f"Condition Number: {hessian_cond:.3e}\n"
+main_results_str += f"Condition Number: {hessian_norm:.3e}\n"
 print(main_results_str)
 
 with open(SUB_DIR / 'main_results.txt', 'a') as f:
@@ -383,11 +403,13 @@ with open(SUB_DIR / 'main_results.txt', 'a') as f:
 
 #save data as array for plotting
 np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
-         saved_parameter = save_param,
-         sq_flux_value = Jf.J(),
-         perturbed_sq_flux_data = squared_flux_data,
-         gradient = np.linalg.norm(JF.dJ()),
-         condition_number = cond_number
+        saved_parameter = save_param,
+        sq_flux_value = Jf.J(),
+        perturbed_sq_flux_data = squared_flux_data,
+        gradient = np.linalg.norm(JF.dJ()),
+        hessian_condition_number = hessian_cond,
+        hessian_norm = hessian_norm,
+        hessian = H,
          )
 
 #Save objective function values from outstr in fun() wrapper function
