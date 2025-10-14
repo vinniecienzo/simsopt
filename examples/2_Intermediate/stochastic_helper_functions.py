@@ -280,8 +280,26 @@ class CentroidPerturbed(sopp.Curve, Curve):
         assert np.linalg.norm(quadpoints - self.curve.quadpoints) < 1e-15
         gamma[:] = self.curve.gamma() + self.sample_direc*self.sample_amount
         
+    def gammadash_impl(self, gammadash):
+        gammadash[:] = self.curve.gammadash() 
+
+    def gammadashdash_impl(self, gammadashdash):
+        gammadashdash[:] = self.curve.gammadashdash() 
+
+    def gammadashdashdash_impl(self, gammadashdashdash):
+        gammadashdashdash[:] = self.curve.gammadashdashdash() 
+
     def dgamma_by_dcoeff_vjp(self, v):
         return self.curve.dgamma_by_dcoeff_vjp(v)
+
+    def dgammadash_by_dcoeff_vjp(self, v):
+        return self.curve.dgammadash_by_dcoeff_vjp(v)
+
+    def dgammadashdash_by_dcoeff_vjp(self, v):
+        return self.curve.dgammadashdash_by_dcoeff_vjp(v)
+
+    def dgammadashdashdash_by_dcoeff_vjp(self, v):
+        return self.curve.dgammadashdashdash_by_dcoeff_vjp(v)
 
     
 def curve_fourier_fit(base_curves_pert,s,order):
