@@ -301,6 +301,53 @@ class CentroidPerturbed(sopp.Curve, Curve):
     def dgammadashdashdash_by_dcoeff_vjp(self, v):
         return self.curve.dgammadashdashdash_by_dcoeff_vjp(v)
 
+class OrientationPerturbed(sopp.Curve, Curve):
+    def __init__(self, curve, sample):
+        r"""
+
+        """
+        self.curve = curve
+        sopp.Curve.__init__(self, curve.quadpoints)
+        Curve.__init__(self, depends_on=[curve])
+        self.sample_theta_x, self.sample_theta_y, self.sample_theta_z = sample #given as rg.standard_normal(3), SIGMA_CENTROID*rg.standard_normal(); plan on cleaning this at some point
+        
+    def gamma_impl(self, gamma, quadpoints):
+        assert quadpoints.shape[0] == self.curve.quadpoints.shape[0]
+        assert np.linalg.norm(quadpoints - self.curve.quadpoints) < 1e-15
+        Rx = [[1,        0,         0],
+          [0, np.cos(self.sample_theta_x), -np.sin(self.sample_theta_x)],
+          [0, np.sin(self.sample_theta_x),  np.cos(self.sample_theta_x)]]
+        
+        Ry = [[np.cos(self.sample_theta_y),  0, np.sin(self.sample_theta_y)],
+          [0,        1,        0],
+          [-np.sin(self.sample_theta_y), 0, np.cos(self.sample_theta_y)]]
+        
+        Rz = [[np.cos(self.sample_theta_z), -np.sin(self.sample_theta_z), 0],
+          [np.sin(self.sample_theta_z),  np.cos(self.sample_theta_z), 0],
+          [0,        0,        1]]
+        
+        gamma[:] = Rx@Ry@Rz@self.curve.gamma()
+        
+    def gammadash_impl(self, gammadash):
+        gammadash[:] = self.curve.gammadash() 
+
+    def gammadashdash_impl(self, gammadashdash):
+        gammadashdash[:] = self.curve.gammadashdash() 
+
+    def gammadashdashdash_impl(self, gammadashdashdash):
+        gammadashdashdash[:] = self.curve.gammadashdashdash() 
+
+    def dgamma_by_dcoeff_vjp(self, v):
+        return self.curve.dgamma_by_dcoeff_vjp(v)
+
+    def dgammadash_by_dcoeff_vjp(self, v):
+        return self.curve.dgammadash_by_dcoeff_vjp(v)
+
+    def dgammadashdash_by_dcoeff_vjp(self, v):
+        return self.curve.dgammadashdash_by_dcoeff_vjp(v)
+
+    def dgammadashdashdash_by_dcoeff_vjp(self, v):
+        return self.curve.dgammadashdashdash_by_dcoeff_vjp(v)
     
 def curve_fourier_fit(base_curves_pert,s,order):
  
