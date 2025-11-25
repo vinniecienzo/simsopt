@@ -2,9 +2,11 @@ from dataclasses import dataclass
 
 import numpy as np
 from sympy import Symbol, lambdify, exp
+import jax.numpy as jnp
 
 from simsopt._core.json import GSONable
 from simsopt._core.util import RealArray
+from simsopt.geo.jit import jit
 
 import simsoptpp as sopp
 from simsopt.geo.curve import Curve
@@ -13,8 +15,21 @@ from simsopt.field.coil import Current, CurrentBase
 
 
 __all__ = ['GaussianSampler', 'PerturbationSample', 'CurvePerturbed_jsonfix', 'curve_fourier_fit',
-           'CurrentPerturbed', 'CentroidPerturbed', 'hessian', 'mpi_hessian']
+           'CurrentPerturbed', 'CentroidPerturbed', 'hessian', 'OrientationPerturbed']
 
+@jit
+def centroid_pure(gamma, gammadash):
+    """
+    This pure function is used in a Python+Jax implementation of formula for centroid.
+
+    .. math::
+        \mathbf{c} = \frac{1}{L} \int_0^L \mathbf{\gamma}(l) dl
+
+    where :math:`\gamma` is the position vector on the curve.
+    """
+    arclength = jnp.linalg.norm(gammadash, axis=-1)
+    centroid = jnp.sum(gamma * arclength[:, None], axis=0) / jnp.sum(arclength)
+    return centroid
 
 @dataclass
 class GaussianSampler(GSONable):
@@ -309,44 +324,50 @@ class OrientationPerturbed(sopp.Curve, Curve):
         self.curve = curve
         sopp.Curve.__init__(self, curve.quadpoints)
         Curve.__init__(self, depends_on=[curve])
-        self.sample_theta_x, self.sample_theta_y, self.sample_theta_z = sample #given as rg.standard_normal(3), SIGMA_CENTROID*rg.standard_normal(); plan on cleaning this at some point
+        self.sample_theta_x, self.sample_theta_y, self.sample_theta_z = sample #given as SIGMA_ORIENTATION*rg.standard_normal(3)
+        self.Rx = np.array([[1,                            0,                           0],
+                            [0, np.cos(self.sample_theta_x), -np.sin(self.sample_theta_x)],
+                            [0, np.sin(self.sample_theta_x),  np.cos(self.sample_theta_x)]])
+        
+        self.Ry = np.array([[np.cos(self.sample_theta_y),  0, np.sin(self.sample_theta_y)],
+                            [0,                            1,                           0],
+                            [-np.sin(self.sample_theta_y), 0, np.cos(self.sample_theta_y)]])
+        
+        self.Rz = np.array([[np.cos(self.sample_theta_z), -np.sin(self.sample_theta_z), 0],
+                            [np.sin(self.sample_theta_z),  np.cos(self.sample_theta_z), 0],
+                            [0,                            0,                           1]])
+        self.rotmatT = (self.Rx @ self.Ry @ self.Rz).T 
         
     def gamma_impl(self, gamma, quadpoints):
         assert quadpoints.shape[0] == self.curve.quadpoints.shape[0]
         assert np.linalg.norm(quadpoints - self.curve.quadpoints) < 1e-15
-        Rx = [[1,        0,         0],
-          [0, np.cos(self.sample_theta_x), -np.sin(self.sample_theta_x)],
-          [0, np.sin(self.sample_theta_x),  np.cos(self.sample_theta_x)]]
-        
-        Ry = [[np.cos(self.sample_theta_y),  0, np.sin(self.sample_theta_y)],
-          [0,        1,        0],
-          [-np.sin(self.sample_theta_y), 0, np.cos(self.sample_theta_y)]]
-        
-        Rz = [[np.cos(self.sample_theta_z), -np.sin(self.sample_theta_z), 0],
-          [np.sin(self.sample_theta_z),  np.cos(self.sample_theta_z), 0],
-          [0,        0,        1]]
-        
-        gamma[:] = Rx@Ry@Rz@self.curve.gamma()
+        gamma_arr = np.asarray(self.curve.gamma())
+        centroid = np.asarray(centroid_pure(gamma_arr, self.curve.gammadash()))
+        gamma[:] = ((gamma_arr - centroid) @ self.rotmatT) + centroid                
         
     def gammadash_impl(self, gammadash):
-        gammadash[:] = self.curve.gammadash() 
+        gammadash[:] = self.curve.gammadash() @ self.rotmatT 
 
     def gammadashdash_impl(self, gammadashdash):
-        gammadashdash[:] = self.curve.gammadashdash() 
+        gammadashdash[:] = self.curve.gammadashdash() @ self.rotmatT
 
     def gammadashdashdash_impl(self, gammadashdashdash):
-        gammadashdashdash[:] = self.curve.gammadashdashdash() 
+        gammadashdashdash[:] = self.curve.gammadashdashdash() @ self.rotmatT
 
     def dgamma_by_dcoeff_vjp(self, v):
+        v = v @ self.rotmatT
         return self.curve.dgamma_by_dcoeff_vjp(v)
 
     def dgammadash_by_dcoeff_vjp(self, v):
+        v = v @ self.rotmatT
         return self.curve.dgammadash_by_dcoeff_vjp(v)
 
     def dgammadashdash_by_dcoeff_vjp(self, v):
+        v = v @ self.rotmatT
         return self.curve.dgammadashdash_by_dcoeff_vjp(v)
 
     def dgammadashdashdash_by_dcoeff_vjp(self, v):
+        v = v @ self.rotmatT
         return self.curve.dgammadashdashdash_by_dcoeff_vjp(v)
     
 def curve_fourier_fit(base_curves_pert,s,order):
@@ -450,58 +471,7 @@ def hessian(fun, dofs, eps=1e-6):
     return 0.5*(H + H.T)
 
 
-import numpy as np
-from mpi4py import MPI
-from simsopt._core.util import parallel_loop_bounds
-
-
-def mpi_hessian(fun, dofs, comm, eps=1e-6):
-    """
-    Computes the Hessian matrix of a function in parallel using MPI.
-
-    The calculation of the columns of the Hessian is distributed among MPI ranks.
-
-    Args:
-        fun: A function that returns a tuple (value, gradient) for a given input.
-        dofs: The point (degrees of freedom) at which to evaluate the Hessian.
-        comm: The MPI communicator to use for parallelization.
-        eps: The step size for the finite difference approximation.
-
-    Returns:
-        The symmetric Hessian matrix.
-    """
-    rank = comm.Get_rank()
-    print(f"rank {rank} func called")
-    x = np.asarray(dofs, dtype=float)
-    n = len(x)
-    
-    # Initialize a local Hessian matrix with zeros. Each rank will fill
-    # in only its assigned columns.
-    H_local = np.zeros((n, n))
-
-    # Determine which columns this MPI rank is responsible for
-    start_idx, end_idx = parallel_loop_bounds(comm, n)
-
-    # Each rank computes its subset of the columns
-    for j in range(start_idx, end_idx):
-        x_fwd = x.copy()
-        x_bwd = x.copy()
-        x_fwd[j] += eps
-        x_bwd[j] -= eps
         
-        _, g_fwd = fun(x_fwd)
-        _, g_bwd = fun(x_bwd)
-        
-        H_local[:, j] = (g_fwd - g_bwd) / (2 * eps)
-    print(f"rank {rank} loop done")
-    # Use Allreduce to sum the partial Hessian matrices from all ranks.
-    # Each rank contributes its computed columns, and MPI.SUM assembles
-    # the final matrix, which is then available on all ranks.
-    H_global = np.zeros_like(H_local)
-    comm.Allreduce(H_local, H_global, op=MPI.SUM)
-
-    # Symmetrize the result to improve accuracy
-    return 0.5 * (H_global + H_global.T)
 
     
     

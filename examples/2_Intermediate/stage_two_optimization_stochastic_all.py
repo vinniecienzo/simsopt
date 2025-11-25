@@ -45,6 +45,8 @@ from simsopt.field.selffield import regularization_circ
 from stochastic_helper_functions import *
 
 
+
+
 start = time.time()
 
 # assign slurm array job number to variable
@@ -69,25 +71,33 @@ SIGMA_CURVE, L_CURVE = 1e-2, 0.5
 CURRENT_BASE = 1e5
 SIGMA_CURRENT = 1e-1 * CURRENT_BASE 
 SIGMA_CENTROID = 1e-2
+SIGMA_ORIENTATION = 3*np.pi/180
+
+# Parameters for the iniital guess perturbation
+SIGMA_INITIAL_GUESS = 0
+L_INITIAL_GUESS = 0.2
+SEED_INITIAL_GUESS = 0
+fourier_fit = False
 
 PERT_CURRENT = False
-PERT_CURVE = False
-PERT_CENTROID = True
+PERT_CURVE = True
+PERT_CENTROID = False
+PERT_ORIENTATION = False
 
 # Pick which configuration you want
-CONFIG_NAME = "NCSX_4coil" 
+CONFIG_NAME = "NCSX" 
 
-RUN_MODE = 'normal'
+RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
     proc0_print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
-    L_INITIAL_GUESS = 0.15 # Length scale for the initial guess perturbation
+    SIGMA_INITIAL_GUESS = 4e-2 # Standard deviation for the initial guess perturbation
+    L_INITIAL_GUESS = 0.2 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
     proc0_print(loop_label)
-    seed_initial_guess = slurm_array_int #assign seed using slurm array number
+    SEED_INITIAL_GUESS = slurm_array_int #assign seed using slurm array number
     save_param = slurm_array_int #relevant parameters to save correspond with saved data
     
 elif RUN_MODE == 'sigma_l_scan':
@@ -141,6 +151,7 @@ else:
 SIGMA_CURRENT = SIGMA_CURRENT if PERT_CURRENT else 0
 SIGMA_CURVE = SIGMA_CURVE if PERT_CURVE else 0
 SIGMA_CENTROID = SIGMA_CENTROID if PERT_CENTROID else 0
+SIGMA_ORIENTATION = SIGMA_ORIENTATION if PERT_ORIENTATION else 0
 
 # Out-of-sample evaluation parameters
 N_OOS = 1000
@@ -148,6 +159,7 @@ SIGMA_CURVE_OOS = SIGMA_CURVE
 L_CURVE_OOS = L_CURVE
 SIGMA_CURRENT_OOS = SIGMA_CURRENT
 SIGMA_CENTROID_OOS = SIGMA_CENTROID
+SIGMA_ORIENTATION_OOS = SIGMA_ORIENTATION
 
 # Number of iterations to perform:
 MAXITER = 50 if in_github_actions else 2000
@@ -171,15 +183,18 @@ TEST_DIR = (Path(__file__).parent / ".." / ".." / "tests" / "test_files").resolv
 surf_filename = TEST_DIR / config["surface_filename"]
 
 # Directory for output
-out_dir_path = f"output_stage_two_optimization_stochastic_{CONFIG_NAME}_{N_SAMPLES}nsamp_{RUN_MODE}"
-if PERT_CURRENT and PERT_CURVE and PERT_CENTROID:
+out_dir_path = f"output_stage_two_optimization_stochastic_{CONFIG_NAME}_{N_SAMPLES}nsamp_{RUN_MODE}_{SIGMA_ORIENTATION*180/np.pi}"
+
+if PERT_CURRENT and PERT_CURVE and PERT_CENTROID and PERT_ORIENTATION:
     out_dir_path += "_all"
-elif PERT_CURRENT:
+if PERT_CURRENT:
     out_dir_path += "_currents"
-elif PERT_CURVE:
+if PERT_CURVE:
     out_dir_path += "_curves"
-elif PERT_CENTROID:
+if PERT_CENTROID:
     out_dir_path += "_centroids"
+if PERT_ORIENTATION:
+    out_dir_path += "_orientations"
 
 if RUN_MODE == 'pert_init':
     if fourier_fit == True:
@@ -228,9 +243,9 @@ base_curves_init = create_equally_spaced_curves(ncoils, s.nfp, stellsym=True, R0
 curves_to_vtk(base_curves_init, OUT_DIR / f"base_curves_init")
 
 # Perturb coils
-if RUN_MODE == "pert_init":
+if SIGMA_INITIAL_GUESS != 0:
     
-    rg_initial_guess = Generator(PCG64DXSM(seed_initial_guess))
+    rg_initial_guess = Generator(PCG64DXSM(SEED_INITIAL_GUESS))
     sampler_initial_guess = GaussianSampler(base_curves_init[0].quadpoints, SIGMA_INITIAL_GUESS, L_INITIAL_GUESS, n_derivs=2)
     base_curves_pert = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler_initial_guess, randomgen=rg_initial_guess)) for c in base_curves_init]
 
@@ -284,11 +299,9 @@ linkNum = LinkingNumber(curves)
 seed = 0
 rg = Generator(PCG64DXSM(seed))
 # rg = np.random.Generator(PCG64(seed, inc=0))
-SIGMA_CURVE = 0
 sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE, L_CURVE, n_derivs=1)
 Jfs = []
 curves_pert = []
-curves_centroid_pert = []
 currents_pert = []
 proc0_print("Starting N_SAMPLE LOOP")
 for i in range(N_SAMPLES):
@@ -297,18 +310,21 @@ for i in range(N_SAMPLES):
     base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
     # systematic coil centroid position error
     base_curves_centroid_perturbed = [CentroidPerturbed(c,(rg.standard_normal(3), SIGMA_CENTROID*rg.standard_normal())) for c in base_curves_perturbed]
-    coils = coils_via_symmetries(base_curves_centroid_perturbed, base_currents, s.nfp, True)
+    # systematic coil orientation error
+    base_curves_orientation_perturbed = [OrientationPerturbed(c, SIGMA_ORIENTATION*rg.standard_normal(3)) for c in base_curves_centroid_perturbed]
+    coils = coils_via_symmetries(base_curves_orientation_perturbed, base_currents, s.nfp, True)
     # now add the 'statistical' error. this error is added to each of the final coils, and independent between all of them.
     # statistical coil position and current error
     coils_pert = [Coil(CurvePerturbed_jsonfix(c.curve, PerturbationSample(sampler, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT*rg.standard_normal())) for c in coils]
     # statistical centroid position error
-    coils_centroid_pert = [Coil(CentroidPerturbed(c.curve,(rg.standard_normal(3), SIGMA_CENTROID*rg.standard_normal())),c.current) for c in coils_pert]
+    coils_centroid_pert = [Coil(CentroidPerturbed(c.curve, (rg.standard_normal(3), SIGMA_CENTROID*rg.standard_normal())),c.current) for c in coils_pert]
+    # statistical coil orientation error
+    coils_orientation_pert = [Coil(OrientationPerturbed(c.curve, SIGMA_ORIENTATION*rg.standard_normal(3)), c.current) for c in coils_centroid_pert]
     # save curves for plotting; saves coil position perturbed and coil + centroid position perturbed curves
-    curves_pert.append([c.curve for c in coils_pert])
-    curves_centroid_pert.append([c.curve for c in coils_centroid_pert])
+    curves_pert.append([c.curve for c in coils_orientation_pert])
     # save current pert current array
-    currents_pert.append([c.current.get_value() for c in coils_centroid_pert])
-    bs_pert = BiotSavart(coils_centroid_pert)
+    currents_pert.append([c.current.get_value() for c in coils_orientation_pert])
+    bs_pert = BiotSavart(coils_orientation_pert)
     Jfs.append(SquaredFlux(s, bs_pert))
 
     
@@ -317,14 +333,18 @@ if PERT_CURVE:
         if k < 15:
             curves_to_vtk(curves_pert[k], SUB_PERT_DIR / f"curves_pert_n_sample_{k}")
 if PERT_CENTROID:
-    for k in range(len(curves_centroid_pert)):
+    for k in range(len(curves_pert)):
         if k < 15:
-            curves_to_vtk(curves_centroid_pert[k], SUB_PERT_DIR / f"curves_centroid_pert_n_sample_{k}")
+            curves_to_vtk(curves_pert[k], SUB_PERT_DIR / f"curves_centroid_pert_n_sample_{k}")
 if PERT_CURRENT:
     for k in range(len(currents_pert)):
         if k<15:
             np.save(SUB_PERT_DIR / f"currents_pert_n_sample_{k}", currents_pert[k])
-        
+if PERT_ORIENTATION:
+    for k in range(len(curves_pert)):
+        if k<15:
+            curves_to_vtk(curves_pert[k], SUB_PERT_DIR / f"curves_orientation_pert_n_sample_{k}")
+            
 Jmpi = MPIObjective(Jfs, comm_world, needs_splitting=True)
 
 # Form the total objective function. To do this, we can exploit the
@@ -366,7 +386,7 @@ def fun(dofs):
     outstr += f", Len=sum([{cl_string}])={sum(J.J() for J in Jls):.1f}, ϰ=[{kap_string}], ∫ϰ²/L>=[{msc_string}], C-C-Sep={Jccdist.shortest_distance():.2f}"
     outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
     last_outstr = outstr
-    # proc0_print(outstr, flush=True)
+    proc0_print(outstr, flush=True)
     
     return J, grad
 
@@ -441,49 +461,64 @@ Jf.x = res.x
 rg = Generator(PCG64DXSM(seed+1))
 sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
 b_dot_n_pert = np.zeros((qphi, qtheta)) 
-squared_flux_data = [[],[],[],[]] if PERT_CURVE and PERT_CURRENT and PERT_CENTROID else [[]]
+squared_flux_data = [[],[],[],[],[]] if PERT_CURVE and PERT_CURRENT and PERT_CENTROID and PERT_ORIENTATION else [[]]
 curves_pert_oos = []
-perturbation_number = 4 if PERT_CURVE and PERT_CURRENT and PERT_CENTROID else 1
+perturbation_number = 5 if PERT_CURVE and PERT_CURRENT and PERT_CENTROID and PERT_ORIENTATION else 1
 for j in range(perturbation_number):
     #perturb curves, centroids and currents, then currents only, then curves only, then centroid only
     if j==0:
         sampler_j = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
         SIGMA_CENTROID_OOS_j = SIGMA_CENTROID_OOS
         SIGMA_CURRENT_OOS_j = SIGMA_CURRENT_OOS
+        SIGMA_ORIENTATION_OOS_j = SIGMA_ORIENTATION_OOS
     elif j==1:
-        
+        #pert current only
         sampler_j = GaussianSampler(curves[0].quadpoints, 0, L_CURVE_OOS, n_derivs=1)
         SIGMA_CENTROID_OOS_j = 0
         SIGMA_CURRENT_OOS_j = SIGMA_CURRENT_OOS
+        SIGMA_ORIENTATION_OOS_j = 0
     elif j==2:
-    
+        #pert curves only
         sampler_j = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
         SIGMA_CURRENT_OOS_j = 0
         SIGMA_CENTROID_OOS_j = 0
+        SIGMA_ORIENTATION_OOS_j = 0
     elif j==3:
-    
+        #pert centroid only
         sampler_j = GaussianSampler(curves[0].quadpoints, 0, L_CURVE_OOS, n_derivs=1)
         SIGMA_CENTROID_OOS_j = SIGMA_CENTROID_OOS
         SIGMA_CURRENT_OOS_j = 0
+        SIGMA_ORIENTATION_OOS_j = 0
+    elif j==4:
+        #pert orientation only
+        sampler_j = GaussianSampler(curves[0].quadpoints, 0, L_CURVE_OOS, n_derivs=1)
+        SIGMA_CENTROID_OOS_j = 0
+        SIGMA_CURRENT_OOS_j = 0
+        SIGMA_ORIENTATION_OOS_j = SIGMA_ORIENTATION_OOS
+        
     for i in range(N_OOS):
         # systematic coil position error
         base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler_j, randomgen=rg)) for c in base_curves]
         # systematic coil centroid position error
         base_curves_centroid_perturbed = [CentroidPerturbed(c,(rg.standard_normal(3), SIGMA_CENTROID_OOS_j*rg.standard_normal())) for c in base_curves_perturbed]
-        coils = coils_via_symmetries(base_curves_centroid_perturbed, base_currents, s.nfp, True)
+        # systematic coil orientation error
+        base_curves_orientation_perturbed = [OrientationPerturbed(c, SIGMA_ORIENTATION_OOS_j*rg.standard_normal(3)) for c in base_curves_centroid_perturbed]
+        coils = coils_via_symmetries(base_curves_orientation_perturbed, base_currents, s.nfp, True)
         # now add the 'statistical' error. this error is added to each of the final coils, and independent between all of them.
         # statistical coil position and current error
         coils_pert = [Coil(CurvePerturbed_jsonfix(c.curve, PerturbationSample(sampler_j, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT_OOS_j*rg.standard_normal())) for c in coils]
         # statistical centroid position error
         coils_centroid_pert = [Coil(CentroidPerturbed(c.curve,(rg.standard_normal(3), SIGMA_CENTROID_OOS_j*rg.standard_normal())),c.current) for c in coils_pert]
+        # statistical coil orientation error
+        coils_orientation_pert = [Coil(OrientationPerturbed(c.curve, SIGMA_ORIENTATION_OOS_j*rg.standard_normal(3)),c.current) for c in coils_centroid_pert]
         # Squared Flux calculation
-        bs_pert = BiotSavart(coils_centroid_pert) 
+        bs_pert = BiotSavart(coils_orientation_pert) 
         bs_pert.set_points(s.gamma().reshape((-1, 3)))
         squared_flux_data[j].append(SquaredFlux(s, bs_pert).J())
         #only save first 15 samples
         if j==0 and i<15: 
-            curves_pert_oos.append([c.curve for c in coils_centroid_pert])
-            curves_to_vtk(curves_pert_oos[-1], SUB_PERT_DIR / f"curves_pert_oos_{loop_label}_sample_{i}")
+            curves_pert_oos.append([c.curve for c in coils_orientation_pert])
+            curves_to_vtk(curves_pert_oos[-1], SUB_PERT_DIR / f"curves_opt_pert_oos_{loop_label}_sample_{i}")
         #print progress
         if (i+1) % (N_OOS/10) == 0:
             proc0_print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
@@ -494,12 +529,41 @@ main_results_str += f"Out-of-sample flux value                  : {np.mean(squar
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Mean Flux Objective across perturbed coils: {Jmpi.J():.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
-H = hessian(fun, res.x)
-hessian_norm = np.linalg.norm(H, 2)
-hessian_cond = np.linalg.cond(H, 2)
-print("h")
-main_results_str += f"Condition Number: {hessian_cond:.3e}\n"
-main_results_str += f"Condition Number: {hessian_norm:.3e}\n"
+
+def sq_flux(dofs):
+    Jf_placeholder = Jf
+    Jf_placeholder.x = dofs
+    return Jf_placeholder.J(), Jf_placeholder.dJ()
+H = hessian(sq_flux, res.x)
+if order>5:
+    high_order_idx = []
+    for i in range(ncoils):
+        #start and end indices for the coil's coefficients
+        coil_idx_start = i*3*(2*order+1) + (ncoils -1)
+        for j in range(3):
+            coord_idx_start = coil_idx_start + j*(2*order+1)
+            idx = [k for k in range(coord_idx_start + 11, coord_idx_start + (2*order+1))]
+            high_order_idx.append(idx)
+high_order_idx = np.array(high_order_idx)
+high_order_idx = high_order_idx.ravel()
+H = np.delete(H, high_order_idx, axis=0)
+H = np.delete(H, high_order_idx, axis=1)
+
+hessian_cond_1 = np.linalg.cond(H, 1)
+hessian_cond_2 = np.linalg.cond(H, 2)
+hessian_cond_inf = np.linalg.cond(H, np.inf)
+eigenvals_hessian = np.linalg.eigvalsh(H)
+
+try:
+    np.linalg.cholesky(H)
+    is_pd = True
+except np.linalg.LinAlgError:
+    is_pd = False
+proc0_print(f"Hessian is positive definite = {is_pd}")
+
+main_results_str += f"Condition Number (1-Norm): {hessian_cond_1:.3e}\n"
+main_results_str += f"Condition Number (2-Norm): {hessian_cond_2:.3e}\n"
+main_results_str += f"Condition Number (Inf Norm): {hessian_cond_inf:.3e}\n"
 proc0_print(main_results_str)
 
 #save data as array for plotting
@@ -508,19 +572,20 @@ np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
         sq_flux_value = Jf.J(),
         perturbed_sq_flux_data = squared_flux_data,
         gradient = np.linalg.norm(JF.dJ()),
-        hessian_condition_number = hessian_cond,
-        hessian_norm = hessian_norm,
-        
+        hessian_condition_number_1 = hessian_cond_1,
+        hessian_condition_number_2 = hessian_cond_2,
+        hessian_condition_number_inf = hessian_cond_inf,
+        eigenvals_hessian = eigenvals_hessian
         )
 
 from mpi4py import MPI
 comm_world = MPI.COMM_WORLD
 if MPI.COMM_WORLD.rank == 0:
     with open(SUB_DIR / 'main_results.txt', 'a') as f:
-        f.write(f"Run {loop_label}: \n" + main_results_str)   
+        f.write(f" Run {loop_label}: \n" + main_results_str)   
     #Save objective function values from outstr in fun() wrapper function
     with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
-        f.write(f"Run {loop_label}: \n" + last_outstr)
+        f.write(f"\n Run {loop_label}: \n" + last_outstr)
 
     # Write input parameters to file
     # Just specify the variable names you want
