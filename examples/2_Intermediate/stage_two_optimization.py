@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 r"""
 In this example we solve a FOCUS like Stage II coil optimisation problem: the
@@ -32,11 +33,11 @@ from simsopt.field import BiotSavart, Current, Coil, coils_via_symmetries
 from simsopt.geo import (SurfaceRZFourier, curves_to_vtk, create_equally_spaced_curves,
                          CurveLength, CurveCurveDistance, MeanSquaredCurvature,
                          LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation,
-                         GaussianSampler, CurvePerturbed,
+                         GaussianSampler, #CurvePerturbed,
                          PerturbationSample, LinkingNumber) # CurrentPerturbed removed should not affect EW1
 from simsopt.objectives import Weight, SquaredFlux, QuadraticPenalty
-from simsopt.util import in_github_actions
-
+from simsopt.util import in_github_actions,proc0_print, comm_world 
+from stochastic_helper_functions import *
 
 start = time.time()
 
@@ -44,34 +45,34 @@ start = time.time()
 slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
 
 # Number of Fourier modes describing each Cartesian component of each coil:
-order = 24
+order = 16
 
 # Number of samples for out-of-sample evaluation
 N_OOS = 1000
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
-SIGMA_OOS, L_OOS = 1e-2, 0.5
+SIGMA_OOS, L_OOS = 5e-3, 0.5
 
 # Choose and load input parameters from configuration
 CONFIG_NAME = "QH5"
 
-RUN_MODE = 'sigma_l_scan'
+RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
-    print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
-    L_INITIAL_GUESS = 0.15 # Length scale for the initial guess perturbation
+    proc0_print("Running initial guess perturbation scan")
+    SIGMA_INITIAL_GUESS = 5e-3 # Standard deviation for the initial guess perturbation
+    L_INITIAL_GUESS = 0.5 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
-    print(loop_label)
+    proc0_print(loop_label)
     seed_initial_guess = slurm_array_int #assign seed using slurm array number
     save_param = slurm_array_int #relevant parameters to save correspond with saved data
         
 elif RUN_MODE == 'sigma_l_scan':
     #scan sigma and L values for optimization
-    print("Running sigma and l scan")
+    proc0_print("Running sigma and l scan")
     sigma_values = np.linspace(1e-3, 1e-2, 8) #sigma values to scan
     L_values = np.linspace(0.5, 0.5, 1) #L values to scan
     sigma_and_L = [(sigma, L) for sigma in sigma_values for L in L_values] #pairs of sigma and L
@@ -82,22 +83,22 @@ elif RUN_MODE == 'sigma_l_scan':
     SIGMA_OOS, L_OOS = sigma_and_L[slurm_array_int] #assign sigma and L using slurm array number
     loop_label = slurm_array_int #specify what to label results for each run
     save_param = (SIGMA_OOS,L_OOS) #relevant parameters to save correspond with saved data
-    print(loop_label)
+    proc0_print(loop_label)
     
 elif RUN_MODE == 'order_scan':
     #scan order values 
-    print("Running order scan")
+    proc0_print("Running order scan")
     order_values = [int(i) for i in range(4,36,4)] #order values to scan
     order = order_values[slurm_array_int] #assign order using slurm array number
     loop_label = f"order={order}" #specify what to label results for each run
     save_param = order #relevant parameters to save to correspond with saved data
-    print(loop_label)
+    proc0_print(loop_label)
     if slurm_array_int >= len(order_values):
         raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(order_values)} orders")
 
 elif RUN_MODE == 'normal':
     #Run one optimization, no scanning
-    print("Running normal mode")
+    proc0_print("Running normal mode")
     loop_label = ""
     save_param = 0
     
@@ -183,7 +184,7 @@ if RUN_MODE == "pert_init":
 
     rg_initial_guess = Generator(PCG64DXSM(seed_initial_guess))
     sampler_initial_guess = GaussianSampler(base_curves_init[0].quadpoints, SIGMA_INITIAL_GUESS, L_INITIAL_GUESS, n_derivs=2)
-    base_curves_pert = [CurvePerturbed(c, PerturbationSample(sampler_initial_guess, randomgen=rg_initial_guess)) for c in base_curves_init]
+    base_curves_pert = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler_initial_guess, randomgen=rg_initial_guess)) for c in base_curves_init]
 
     # show initial base coil after perturbation
     curves_to_vtk(base_curves_pert, OUT_DIR / f"base_curves_init_perturbed_{loop_label}")
@@ -191,12 +192,11 @@ if RUN_MODE == "pert_init":
     #fit fourier
     if fourier_fit == True: 
         base_curves, error = curve_fourier_fit(base_curves_pert, s, order)
-        
+        # show initial base coil after perturbation from fourier fit
+        curves_to_vtk(base_curves, OUT_DIR / f"base_curves_init_perturbed_ffit_{loop_label}")
     else:
         base_curves = base_curves_pert
         
-    curves_to_vtk(base_curves, OUT_DIR / f"base_curves_init_pert_{loop_label}")
-    
 else:
     base_curves = base_curves_init
 
@@ -237,15 +237,17 @@ linkNum = LinkingNumber(curves)
 # multiplied by scalars and added:t5
 #+ LENGTH_WEIGHT * sum(Jls) \
 #+ LENGTH_WEIGHT * sum(QuadraticPenalty(J, LENGTH_THRESHOLD, "max") for J in Jls) \
+#    + ARCLENGTH_WEIGHT * sum(Jals) \
     
 JF = Jf \
     + LENGTH_WEIGHT * QuadraticPenalty(sum(Jls), LENGTH_THRESHOLD, "max") \
     + CC_WEIGHT * Jccdist \
     + CURVATURE_WEIGHT * sum(Jcs) \
     + MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs) \
-    + ARCLENGTH_WEIGHT * sum(Jals) \
     + CS_WEIGHT * Jcsdist \
     + LINK_WEIGHT * linkNum
+
+
 
 #J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * sum([QuadraticPenalty(Jls[i], LENGTH_THRESHOLD) for i in range(len(base_curves))])
 # We don't have a general interface in SIMSOPT for optimisation problems that
@@ -271,11 +273,11 @@ def fun(dofs):
     outstr += f", C-C-Sep={Jccdist.shortest_distance():.2f}"
     outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
     last_outstr = outstr
-    print(outstr)
+    proc0_print(outstr)
     return J, grad
 
 
-print("""
+proc0_print("""
 ################################################################################
 ### Perform a Taylor test ######################################################
 ################################################################################
@@ -291,9 +293,9 @@ dJh = sum(dJ0 * h)
 for eps in [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]:
     J1, _ = f(dofs + eps*h)
     J2, _ = f(dofs - eps*h)
-    print("err", (J1-J2)/(2*eps) - dJh)
+    proc0_print("err", (J1-J2)/(2*eps) - dJh)
     
-print("""
+proc0_print("""
 ################################################################################
 ### Run the optimisation #######################################################
 ################################################################################
@@ -323,10 +325,10 @@ sampler = GaussianSampler(curves[0].quadpoints, SIGMA_OOS, L_OOS, n_derivs=1)
 
 for i in range(N_OOS):
     # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
-    base_curves_perturbed = [CurvePerturbed(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
+    base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
     coils = coils_via_symmetries(base_curves_perturbed, base_currents, s.nfp, True)
     # now add the 'statistical' error. this error is added to each of the final coils, and independent between all of them.
-    coils_pert = [Coil(CurvePerturbed(c.curve, PerturbationSample(sampler, randomgen=rg)), c.current) for c in coils]
+    coils_pert = [Coil(CurvePerturbed_jsonfix(c.curve, PerturbationSample(sampler, randomgen=rg)), c.current) for c in coils]
     # Squared Flux calculation
     bs_pert = BiotSavart(coils_pert)
     bs_pert.set_points(s.gamma().reshape((-1, 3)))
@@ -337,7 +339,7 @@ for i in range(N_OOS):
         curves_to_vtk(curves_pert_oos[i], OUT_DIR / f"curves_pert_oos_{loop_label}_sample_{i}")
     #print progress
     if (i+1) % (N_OOS/10) == 0:
-        print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
+        proc0_print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
         
 
 
@@ -347,7 +349,7 @@ main_results_str += f"Out-of-sample flux value                  : {np.mean(squar
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
 
-print(main_results_str)
+proc0_print(main_results_str)
 
 with open(SUB_DIR / 'main_results.txt', 'a') as f:
     f.write(f"Run {loop_label}: \n" + main_results_str)
@@ -385,4 +387,4 @@ time_taken = f"Took {(end - start):.2f} for run {loop_label}."
 with open(SUB_DIR / 'run_times.txt', 'a') as f:
             f.write(time_taken + "\n")
             
-print(f"Took {end-start}s")
+proc0_print(f"Took {end-start}s")
