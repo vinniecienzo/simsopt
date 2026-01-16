@@ -45,10 +45,10 @@ class SquaredFlux(Optimizable):
           ``nphi`` and ``ntheta`` correspond to the number of quadrature points on `surface` 
           in ``phi`` and ``theta`` direction.
         definition: A string to select among the definitions above. The
-          available options are ``"quadratic flux"``, ``"normalized"``, and ``"local"``.
+          available options are ``"quadratic flux"``, ``"normalized"``, and ``"local"``
     """
 
-    def __init__(self, surface, field, target=None, definition="quadratic flux"):
+    def __init__(self, surface, field, target=None, definition="quadratic flux", threshold=0.0):
         self.surface = surface
         if target is not None:
             self.target = np.ascontiguousarray(target)
@@ -60,12 +60,17 @@ class SquaredFlux(Optimizable):
         if definition not in ["quadratic flux", "normalized", "local"]:
             raise ValueError("Unrecognized option for 'definition'.")
         self.definition = definition
+        self.threshold = threshold
         Optimizable.__init__(self, x0=np.asarray([]), depends_on=[field])
 
     def J(self):
         n = self.surface.normal()
         Bcoil = self.field.B().reshape(n.shape)
-        return sopp.integral_BdotN(Bcoil, self.target, n, self.definition)
+        sq_flux = sopp.integral_BdotN(Bcoil, self.target, n, self.definition)
+        if sq_flux < self.threshold:
+            return 0.0
+        else:
+            return sq_flux
 
     @derivative_dec
     def dJ(self):
@@ -103,4 +108,7 @@ class SquaredFlux(Optimizable):
             raise ValueError("Should never get here")
 
         dJdB = dJdB.reshape((-1, 3))
-        return self.field.B_vjp(dJdB)
+        if np.isclose(self.J(), 0.0, atol=1e-10, rtol=1e-10):
+            return self.field.B_vjp(np.zeros_like(dJdB))
+        else:
+            return self.field.B_vjp(dJdB)

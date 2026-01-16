@@ -54,22 +54,34 @@ slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
 order = 16
 
 # Number of samples to approximate the mean
-N_SAMPLES = 4
+N_SAMPLES = 512
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
-SIGMA, L = 5e-3, 0.5
+SIGMA, L = 2.29e-3, 0.5
+
+# Out-of-sample evaluation parameters
+N_OOS = 1000
+SIGMA_OOS = SIGMA
+L_OOS = L
+
+# Number of iterations to perform:
+MAXITER = 50 if in_github_actions else 2000
 
 # Pick which configuration you want
 CONFIG_NAME = "QH5" 
 
-RUN_MODE = 'pert_init'
+RUN_MODE = 'normal'
+
+#######################################################
+# End of input parameters.
+#######################################################
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
     proc0_print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 5e-3 # Standard deviation for the initial guess perturbation
-    L_INITIAL_GUESS = 0.5 # Length scale for the initial guess perturbation
+    SIGMA_INITIAL_GUESS = SIGMA # Standard deviation for the initial guess perturbation
+    L_INITIAL_GUESS = L # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
     proc0_print(loop_label)
@@ -109,19 +121,6 @@ elif RUN_MODE == 'normal':
 else:
     #no proper run mode defined --> dont execute code
     raise ValueError("No run mode defined")
-
-    
-# Out-of-sample evaluation parameters
-N_OOS = 1000
-SIGMA_OOS = SIGMA
-L_OOS = L
-
-# Number of iterations to perform:
-MAXITER = 50 if in_github_actions else 2000
-
-#######################################################
-# End of input parameters.
-#######################################################
 
 #load configuration
 with open("000.input_parameters.json") as f:
@@ -223,7 +222,7 @@ bs = BiotSavart(coils)
 
 curves = [c.curve for c in coils]
 currents = [c.current for c in coils]
-curves_to_vtk(curves, OUT_DIR / f"curves_init_{loop_label}")
+#curves_to_vtk(curves, OUT_DIR / f"curves_init_{loop_label}")
 
 bs.set_points(s_plot.gamma().reshape((-1, 3)))
 pointData = {"B_N": np.sum(bs.B().reshape((qphi, qtheta, 3)) * s_plot.unitnormal(), axis=2)[:, :, None]}

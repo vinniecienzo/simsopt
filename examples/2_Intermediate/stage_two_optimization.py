@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 r"""
 In this example we solve a FOCUS like Stage II coil optimisation problem: the
@@ -32,7 +33,7 @@ from simsopt.field import BiotSavart, Current, Coil, coils_via_symmetries
 from simsopt.geo import (SurfaceRZFourier, curves_to_vtk, create_equally_spaced_curves,
                          CurveLength, CurveCurveDistance, MeanSquaredCurvature,
                          LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation,
-                         GaussianSampler, CurvePerturbed,
+                         GaussianSampler, #CurvePerturbed,
                          PerturbationSample, LinkingNumber) # CurrentPerturbed removed should not affect EW1
 from simsopt.objectives import Weight, SquaredFlux, QuadraticPenalty
 from simsopt.util import in_github_actions,proc0_print, comm_world 
@@ -236,15 +237,17 @@ linkNum = LinkingNumber(curves)
 # multiplied by scalars and added:t5
 #+ LENGTH_WEIGHT * sum(Jls) \
 #+ LENGTH_WEIGHT * sum(QuadraticPenalty(J, LENGTH_THRESHOLD, "max") for J in Jls) \
+#    + ARCLENGTH_WEIGHT * sum(Jals) \
     
 JF = Jf \
     + LENGTH_WEIGHT * QuadraticPenalty(sum(Jls), LENGTH_THRESHOLD, "max") \
     + CC_WEIGHT * Jccdist \
     + CURVATURE_WEIGHT * sum(Jcs) \
     + MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs) \
-    + ARCLENGTH_WEIGHT * sum(Jals) \
     + CS_WEIGHT * Jcsdist \
     + LINK_WEIGHT * linkNum
+
+
 
 #J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * sum([QuadraticPenalty(Jls[i], LENGTH_THRESHOLD) for i in range(len(base_curves))])
 # We don't have a general interface in SIMSOPT for optimisation problems that
