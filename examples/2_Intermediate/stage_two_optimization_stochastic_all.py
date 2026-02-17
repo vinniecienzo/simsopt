@@ -36,10 +36,10 @@ from scipy.optimize import minimize
 from simsopt.field import BiotSavart, Current, Coil, coils_via_symmetries
 from simsopt.geo import (CurveLength, CurveCurveDistance, curves_to_vtk, create_equally_spaced_curves, SurfaceRZFourier,
                          MeanSquaredCurvature, LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation, GaussianSampler, 
-                         CurvePerturbed, CurrentPerturbed,
+                         CurvePerturbed,
                          PerturbationSample, LinkingNumber)
 from simsopt.objectives import QuadraticPenalty, MPIObjective, SquaredFlux
-from simsopt.util import in_github_actions, proc0_print, comm_world, curve_fourier_fit
+from simsopt.util import in_github_actions, proc0_print, comm_world
 from simsopt.field.force import coil_force, LpCurveForce
 from simsopt.field.selffield import regularization_circ
 from stochastic_helper_functions import *
@@ -85,14 +85,14 @@ PERT_CENTROID = False
 PERT_ORIENTATION = False
 
 # Pick which configuration you want
-CONFIG_NAME = "NCSX" 
+CONFIG_NAME = "QA" 
 
 RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
     proc0_print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 4e-2 # Standard deviation for the initial guess perturbation
+    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
     L_INITIAL_GUESS = 0.2 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
