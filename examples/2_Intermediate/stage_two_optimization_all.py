@@ -32,10 +32,10 @@ from simsopt.field import BiotSavart, Current, Coil, coils_via_symmetries
 from simsopt.geo import (SurfaceRZFourier, curves_to_vtk, create_equally_spaced_curves,
                          CurveLength, CurveCurveDistance, MeanSquaredCurvature,
                          LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation,
-                         GaussianSampler, CurvePerturbed, CurrentPerturbed, 
+                         GaussianSampler, CurvePerturbed, 
                          PerturbationSample, LinkingNumber)
 from simsopt.objectives import Weight, SquaredFlux, QuadraticPenalty
-from simsopt.util import in_github_actions, curve_fourier_fit
+from simsopt.util import in_github_actions
 from simsopt.field.force import coil_force, LpCurveForce
 from simsopt.field.selffield import regularization_circ
 from stochastic_helper_functions import *
@@ -74,14 +74,14 @@ PERT_CENTROID = False
 PERT_ORIENTATION = False
 
 # Choose and load input parameters from configuration
-CONFIG_NAME = "NCSX" 
+CONFIG_NAME = "QH3" 
 
 RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
     print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 4e-2 # Standard deviation for the initial guess perturbation
+    SIGMA_INITIAL_GUESS = 0.5e-2 # Standard deviation for the initial guess perturbation
     L_INITIAL_GUESS = 0.2 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
@@ -360,6 +360,8 @@ bs.set_points(s_plot.gamma().reshape((-1, 3)))
 pointData = {"B_N": np.sum(bs.B().reshape((qphi, qtheta, 3)) * s_plot.unitnormal(), axis=2)[:, :, None]}
 s_plot.to_vtk(OUT_DIR / f"surf_opt_{loop_label}", extra_data=pointData)
 bs.set_points(s.gamma().reshape((-1, 3)))
+BdotN = np.mean(np.abs(np.sum(bs.B().reshape((nphi, ntheta, 3)) * s.unitnormal(), axis=2)))
+avg_BdotN_over_B = BdotN / bs.AbsB().mean()
 Jf.x = res.x
 
 curves_to_vtk(base_curves, OUT_DIR / f"base_curves_opt_{loop_label}")
@@ -372,6 +374,7 @@ rg = Generator(PCG64DXSM(seed+1))
 sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
 b_dot_n_pert = np.zeros((qphi, qtheta)) 
 squared_flux_data = [[],[],[],[],[]] if PERT_CURVE and PERT_CURRENT and PERT_CENTROID and PERT_ORIENTATION else [[]]
+avg_BdotN_over_B_data = [[],[],[],[],[]] if PERT_CURVE and PERT_CURRENT and PERT_CENTROID and PERT_ORIENTATION else [[]]
 curves_pert_oos = []
 perturbation_number = 5 if PERT_CURVE and PERT_CURRENT and PERT_CENTROID and PERT_ORIENTATION else 1
 for j in range(perturbation_number):
@@ -424,6 +427,8 @@ for j in range(perturbation_number):
         # Squared Flux calculation
         bs_pert = BiotSavart(coils_orientation_pert) 
         bs_pert.set_points(s.gamma().reshape((-1, 3)))
+        BdotN_pert = np.mean(np.abs(np.sum(bs_pert.B().reshape((nphi, ntheta, 3)) * s.unitnormal(), axis=2)))
+        avg_BdotN_over_B_data[j].append(BdotN_pert/bs_pert.AbsB.mean())
         squared_flux_data[j].append(SquaredFlux(s, bs_pert).J())
         #only save first 15 samples
         if j==0 and i<15: 
@@ -439,6 +444,8 @@ main_results_str = f"Flux Objective for exact coils    : {Jf.J():.3e}\n"
 main_results_str += f"Out-of-sample flux value                  : {np.mean(squared_flux_data[0]):.3e}\n"
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
+main_results_str += f"<B_N>/<|B|> = {avg_BdotN_over_B:.2e}\n"
+main_results_str += f"<B_N_pert>/<|B_pert|> = {np.mean(avg_BdotN_over_B_data):.2e}\n"
 
 def sq_flux(dofs):
     Jf_placeholder = Jf
@@ -491,6 +498,8 @@ np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
         sq_flux_value = Jf.J(),
         perturbed_sq_flux_data = squared_flux_data,
         gradient = np.linalg.norm(JF.dJ()),
+        avg_BdotN_over_B = avg_BdotN_over_B,
+        avg_BdotN_over_B_data = avg_BdotN_over_B_data, 
         hessian_condition_number_1 = hessian_cond_1,
         hessian_condition_number_2 = hessian_cond_2,
         hessian_condition_number_inf = hessian_cond_inf,
@@ -503,7 +512,7 @@ with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
     
 # Write input parameters to file
 # Just specify the variable names you want
-save_vars = ['SIGMA', 'L', 'MAXITER'
+save_vars = ['SIGMA', 'L', 'MAXITER', 'order'
              ]
 
 # Combine both
