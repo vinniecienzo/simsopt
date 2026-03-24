@@ -374,7 +374,6 @@ rg = Generator(PCG64DXSM(seed+1))
 sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
 b_dot_n_pert = np.zeros((qphi, qtheta)) 
 squared_flux_data = [[],[],[],[],[]] if PERT_CURVE and PERT_CURRENT and PERT_CENTROID and PERT_ORIENTATION else [[]]
-avg_BdotN_over_B_data = [[],[],[],[],[]] if PERT_CURVE and PERT_CURRENT and PERT_CENTROID and PERT_ORIENTATION else [[]]
 curves_pert_oos = []
 perturbation_number = 5 if PERT_CURVE and PERT_CURRENT and PERT_CENTROID and PERT_ORIENTATION else 1
 for j in range(perturbation_number):
@@ -427,8 +426,6 @@ for j in range(perturbation_number):
         # Squared Flux calculation
         bs_pert = BiotSavart(coils_orientation_pert) 
         bs_pert.set_points(s.gamma().reshape((-1, 3)))
-        BdotN_pert = np.mean(np.abs(np.sum(bs_pert.B().reshape((nphi, ntheta, 3)) * s.unitnormal(), axis=2)))
-        avg_BdotN_over_B_data[j].append(BdotN_pert/bs_pert.AbsB.mean())
         squared_flux_data[j].append(SquaredFlux(s, bs_pert).J())
         #only save first 15 samples
         if j==0 and i<15: 
@@ -445,7 +442,6 @@ main_results_str += f"Out-of-sample flux value                  : {np.mean(squar
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
 main_results_str += f"<B_N>/<|B|> = {avg_BdotN_over_B:.2e}\n"
-main_results_str += f"<B_N_pert>/<|B_pert|> = {np.mean(avg_BdotN_over_B_data):.2e}\n"
 
 def sq_flux(dofs):
     Jf_placeholder = Jf
@@ -499,7 +495,6 @@ np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
         perturbed_sq_flux_data = squared_flux_data,
         gradient = np.linalg.norm(JF.dJ()),
         avg_BdotN_over_B = avg_BdotN_over_B,
-        avg_BdotN_over_B_data = avg_BdotN_over_B_data, 
         hessian_condition_number_1 = hessian_cond_1,
         hessian_condition_number_2 = hessian_cond_2,
         hessian_condition_number_inf = hessian_cond_inf,
