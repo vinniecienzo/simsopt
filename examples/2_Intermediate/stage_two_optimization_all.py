@@ -74,9 +74,9 @@ PERT_CENTROID = False
 PERT_ORIENTATION = False
 
 # Choose and load input parameters from configuration
-CONFIG_NAME = "QH3" 
+CONFIG_NAME = "NCSX" 
 
-RUN_MODE = 'pert_init'
+RUN_MODE = 'normal'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
@@ -435,6 +435,9 @@ for j in range(perturbation_number):
         if (i+1) % (N_OOS/10) == 0:
             print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
 
+        if (i+1) % (N_OOS/10) == 0:
+            print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
+
     
 #store main results in string, print and save
 main_results_str = f"Flux Objective for exact coils    : {Jf.J():.3e}\n"
@@ -443,45 +446,6 @@ main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.no
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
 main_results_str += f"<B_N>/<|B|> = {avg_BdotN_over_B:.2e}\n"
 
-def sq_flux(dofs):
-    Jf_placeholder = Jf
-    Jf_placeholder.x = dofs
-    return Jf_placeholder.J(), Jf_placeholder.dJ()
-H = hessian(sq_flux, res.x)
-if order>5:
-    high_order_idx = []
-    for i in range(ncoils):
-        #start and end indices for the coil's coefficients
-        coil_idx_start = i*3*(2*order+1) + (ncoils -1)
-        for j in range(3):
-            coord_idx_start = coil_idx_start + j*(2*order+1)
-            idx = [k for k in range(coord_idx_start + 11, coord_idx_start + (2*order+1))]
-            high_order_idx.append(idx)
-    high_order_idx = np.array(high_order_idx)
-    high_order_idx = high_order_idx.ravel()
-    H = np.delete(H, high_order_idx, axis=0)
-    H = np.delete(H, high_order_idx, axis=1)
-
-def sq_flux(dofs):
-    Jf_placeholder = Jf
-    Jf_placeholder.x = dofs
-    return Jf_placeholder.J(), Jf_placeholder.dJ()
-H = hessian(sq_flux, res.x)
-
-hessian_cond_1 = np.linalg.cond(H, 1)
-hessian_cond_2 = np.linalg.cond(H, 2)
-hessian_cond_inf = np.linalg.cond(H, np.inf)
-eigenvals_hessian = np.linalg.eigvalsh(H)
-try:
-    np.linalg.cholesky(H)
-    is_pd = True
-except np.linalg.LinAlgError:
-    is_pd = False
-print(f"Hessian is positive definite = {is_pd}")
-
-main_results_str += f"Condition Number (1-Norm): {hessian_cond_1:.3e}\n"
-main_results_str += f"Condition Number (2-Norm): {hessian_cond_2:.3e}\n"
-main_results_str += f"Condition Number (Inf Norm): {hessian_cond_inf:.3e}\n"
 
 print(main_results_str)
 
@@ -495,10 +459,6 @@ np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
         perturbed_sq_flux_data = squared_flux_data,
         gradient = np.linalg.norm(JF.dJ()),
         avg_BdotN_over_B = avg_BdotN_over_B,
-        hessian_condition_number_1 = hessian_cond_1,
-        hessian_condition_number_2 = hessian_cond_2,
-        hessian_condition_number_inf = hessian_cond_inf,
-        eigenvals_hessian = eigenvals_hessian
          )
 
 #Save objective function values from outstr in fun() wrapper function
