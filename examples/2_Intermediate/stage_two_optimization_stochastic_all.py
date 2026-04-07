@@ -62,7 +62,7 @@ proc0_print(f"SLURM job ID: {job_id}")
 order = 24
 
 # Number of samples to approximate the mean
-N_SAMPLES = 50
+N_SAMPLES = 4
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
@@ -79,20 +79,21 @@ L_INITIAL_GUESS = 0.2
 SEED_INITIAL_GUESS = 0
 fourier_fit = False
 
+
 PERT_CURRENT = False
 PERT_CURVE = True
 PERT_CENTROID = False
 PERT_ORIENTATION = False
 
 # Pick which configuration you want
-CONFIG_NAME = "QA" 
+CONFIG_NAME = "NCSX" 
 
-RUN_MODE = 'pert_init'
+RUN_MODE = 'normal'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
     proc0_print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
+    SIGMA_INITIAL_GUESS = 5e-3 # Standard deviation for the initial guess perturbation
     L_INITIAL_GUESS = 0.2 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
@@ -183,7 +184,7 @@ TEST_DIR = (Path(__file__).parent / ".." / ".." / "tests" / "test_files").resolv
 surf_filename = TEST_DIR / config["surface_filename"]
 
 # Directory for output
-out_dir_path = f"output_stage_two_optimization_stochastic_{CONFIG_NAME}_{N_SAMPLES}nsamp_{RUN_MODE}_{SIGMA_ORIENTATION*180/np.pi}"
+out_dir_path = f"output_stage_two_optimization_stochastic_{CONFIG_NAME}_{N_SAMPLES}nsamp_{RUN_MODE}"
 
 if PERT_CURRENT and PERT_CURVE and PERT_CENTROID and PERT_ORIENTATION:
     out_dir_path += "_all"
@@ -455,6 +456,8 @@ pointData = {"B_N": np.sum(bs.B().reshape((qphi, qtheta, 3)) * s_plot.unitnormal
 s_plot.to_vtk(OUT_DIR / f"surf_opt_{loop_label}", extra_data=pointData)
 
 bs.set_points(s.gamma().reshape((-1, 3)))
+BdotN = np.mean(np.abs(np.sum(bs.B().reshape((nphi, ntheta, 3)) * s.unitnormal(), axis=2)))
+avg_BdotN_over_B = BdotN / bs.AbsB().mean()
 Jf.x = res.x
 
 # now draw some fresh samples to evaluate the out-of-sample error
@@ -529,41 +532,8 @@ main_results_str += f"Out-of-sample flux value                  : {np.mean(squar
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Mean Flux Objective across perturbed coils: {Jmpi.J():.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
+main_results_str += f"<B_N>/<|B|> = {avg_BdotN_over_B:.2e}\n"
 
-def sq_flux(dofs):
-    Jf_placeholder = Jf
-    Jf_placeholder.x = dofs
-    return Jf_placeholder.J(), Jf_placeholder.dJ()
-H = hessian(sq_flux, res.x)
-if order>5:
-    high_order_idx = []
-    for i in range(ncoils):
-        #start and end indices for the coil's coefficients
-        coil_idx_start = i*3*(2*order+1) + (ncoils -1)
-        for j in range(3):
-            coord_idx_start = coil_idx_start + j*(2*order+1)
-            idx = [k for k in range(coord_idx_start + 11, coord_idx_start + (2*order+1))]
-            high_order_idx.append(idx)
-high_order_idx = np.array(high_order_idx)
-high_order_idx = high_order_idx.ravel()
-H = np.delete(H, high_order_idx, axis=0)
-H = np.delete(H, high_order_idx, axis=1)
-
-hessian_cond_1 = np.linalg.cond(H, 1)
-hessian_cond_2 = np.linalg.cond(H, 2)
-hessian_cond_inf = np.linalg.cond(H, np.inf)
-eigenvals_hessian = np.linalg.eigvalsh(H)
-
-try:
-    np.linalg.cholesky(H)
-    is_pd = True
-except np.linalg.LinAlgError:
-    is_pd = False
-proc0_print(f"Hessian is positive definite = {is_pd}")
-
-main_results_str += f"Condition Number (1-Norm): {hessian_cond_1:.3e}\n"
-main_results_str += f"Condition Number (2-Norm): {hessian_cond_2:.3e}\n"
-main_results_str += f"Condition Number (Inf Norm): {hessian_cond_inf:.3e}\n"
 proc0_print(main_results_str)
 
 #save data as array for plotting
@@ -572,10 +542,7 @@ np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
         sq_flux_value = Jf.J(),
         perturbed_sq_flux_data = squared_flux_data,
         gradient = np.linalg.norm(JF.dJ()),
-        hessian_condition_number_1 = hessian_cond_1,
-        hessian_condition_number_2 = hessian_cond_2,
-        hessian_condition_number_inf = hessian_cond_inf,
-        eigenvals_hessian = eigenvals_hessian
+        avg_BdotN_over_B = avg_BdotN_over_B,
         )
 
 from mpi4py import MPI
@@ -589,7 +556,7 @@ if MPI.COMM_WORLD.rank == 0:
 
     # Write input parameters to file
     # Just specify the variable names you want
-    save_vars = ['SIGMA', 'L', 'MAXITER'
+    save_vars = ['SIGMA', 'L', 'MAXITER', 'order'
                 ]
 
     # Combine both
