@@ -62,7 +62,7 @@ proc0_print(f"SLURM job ID: {job_id}")
 order = 24
 
 # Number of samples to approximate the mean
-N_SAMPLES = 4
+N_SAMPLES = 50
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
@@ -88,13 +88,13 @@ PERT_ORIENTATION = False
 # Pick which configuration you want
 CONFIG_NAME = "NCSX" 
 
-RUN_MODE = 'normal'
+RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
     proc0_print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 5e-3 # Standard deviation for the initial guess perturbation
-    L_INITIAL_GUESS = 0.2 # Length scale for the initial guess perturbation
+    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
+    L_INITIAL_GUESS = 0.5 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
     proc0_print(loop_label)
@@ -184,7 +184,7 @@ TEST_DIR = (Path(__file__).parent / ".." / ".." / "tests" / "test_files").resolv
 surf_filename = TEST_DIR / config["surface_filename"]
 
 # Directory for output
-out_dir_path = f"output_stage_two_optimization_stochastic_{CONFIG_NAME}_{N_SAMPLES}nsamp_{RUN_MODE}"
+out_dir_path = f"0output_stage_two_optimization_stochastic_{CONFIG_NAME}_{N_SAMPLES}nsamp_{RUN_MODE}_{SIGMA_ORIENTATION}"
 
 if PERT_CURRENT and PERT_CURVE and PERT_CENTROID and PERT_ORIENTATION:
     out_dir_path += "_all"

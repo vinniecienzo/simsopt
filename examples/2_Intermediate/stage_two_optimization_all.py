@@ -60,7 +60,7 @@ SIGMA_CURVE_OOS, L_CURVE_OOS = 1e-2, 0.5
 CURRENT_BASE = 1e5
 SIGMA_CURRENT_OOS = 1e-1 * CURRENT_BASE
 SIGMA_CENTROID_OOS = 1e-2
-SIGMA_ORIENTATION_OOS = 3*np.pi/180
+SIGMA_ORIENTATION_OOS = 5*np.pi/180
 
 # Parameters for the iniital guess perturbation
 SIGMA_INITIAL_GUESS = 0
@@ -76,13 +76,13 @@ PERT_ORIENTATION = False
 # Choose and load input parameters from configuration
 CONFIG_NAME = "NCSX" 
 
-RUN_MODE = 'normal'
+RUN_MODE = 'pert_init'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
     print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 0.5e-2 # Standard deviation for the initial guess perturbation
-    L_INITIAL_GUESS = 0.2 # Length scale for the initial guess perturbation
+    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
+    L_INITIAL_GUESS = 0.5 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
     print(loop_label)
@@ -155,7 +155,7 @@ TEST_DIR = (Path(__file__).parent / ".." / ".." / "tests" / "test_files").resolv
 filename = TEST_DIR / config["surface_filename"]
 
 # Directory for output
-out_dir_path = f"output_stage_two_optimization_{CONFIG_NAME}_{RUN_MODE}_"
+out_dir_path = f"0output_stage_two_optimization_{CONFIG_NAME}_{RUN_MODE}_"
 
 if PERT_CURRENT and PERT_CURVE and PERT_CENTROID and PERT_ORIENTATION:
     out_dir_path += "_all"
