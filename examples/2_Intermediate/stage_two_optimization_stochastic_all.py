@@ -62,7 +62,7 @@ proc0_print(f"SLURM job ID: {job_id}")
 order = 24
 
 # Number of samples to approximate the mean
-N_SAMPLES = 50
+N_SAMPLES = 4
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
@@ -115,8 +115,8 @@ elif RUN_MODE == 'sigma_l_scan':
     sigma_orientation_values = np.linspace(2,10,8)*np.pi/180
     SIGMA_ORIENTATION = sigma_orientation_values[slurm_array_int]
     if PERT_CURRENT and PERT_CURVE and PERT_CENTROID and PERT_ORIENTATION:
-        loop_label = f"Sigma_curve={SIGMA_CURVE:.3f};L_curve={L_CURVE:.3f},Sigma_current={SIGMA_CURRENT:.3f},Sigma_centroid={SIGMA_CENTROID:.3f}" #specify what to label results for each run
-        save_param = (SIGMA_CURVE,L_CURVE,SIGMA_CURRENT,SIGMA_CENTROID) #relevant parameters to save correspond with saved data
+        loop_label = f"Sigma_curve={SIGMA_CURVE:.3f};L_curve={L_CURVE:.3f},Sigma_current={SIGMA_CURRENT:.3f},Sigma_centroid={SIGMA_CENTROID:.3f},Sigma_orientation:{SIGMA_ORIENTATION:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURVE,L_CURVE,SIGMA_CURRENT,SIGMA_CENTROID,SIGMA_ORIENTATION) #relevant parameters to save correspond with saved data
     elif PERT_CURRENT:
         loop_label = f"Sigma_current={SIGMA_CURRENT:.3f}" #specify what to label results for each run
         save_param = (SIGMA_CURRENT) #relevant parameters to save correspond with saved data

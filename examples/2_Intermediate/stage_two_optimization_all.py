@@ -69,14 +69,14 @@ SEED_INITIAL_GUESS = 0
 fourier_fit = False
 
 PERT_CURRENT = False
-PERT_CURVE = True
+PERT_CURVE = False
 PERT_CENTROID = False
-PERT_ORIENTATION = False
+PERT_ORIENTATION = True
 
 # Choose and load input parameters from configuration
-CONFIG_NAME = "NCSX" 
+CONFIG_NAME = "QA" 
 
-RUN_MODE = 'pert_init'
+RUN_MODE = 'sigma_l_scan'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
@@ -100,8 +100,23 @@ elif RUN_MODE == 'sigma_l_scan':
     SIGMA_CURRENT_OOS = sigma_current_values[slurm_array_int]
     sigma_centroid_values = np.linspace(1e-3, 1e-2, 8)
     SIGMA_CENTROID_OOS = sigma_centroid_values[slurm_array_int]
-    loop_label = f"Sigma_curve={SIGMA_CURVE_OOS:.3f};L_curve={L_CURVE_OOS:.3f},Sigma_current={SIGMA_CURRENT_OOS:.3f},Sigma_centroid={SIGMA_CENTROID_OOS:.3f}" #specify what to label results for each run
-    save_param = (SIGMA_CURVE_OOS,L_CURVE_OOS,SIGMA_CURRENT_OOS,SIGMA_CENTROID_OOS) #relevant parameters to save correspond with saved data
+    sigma_orientation_values = np.linspace(2,10,8)*np.pi/180
+    SIGMA_ORIENTATION_OOS = sigma_orientation_values[slurm_array_int]
+    if PERT_CURRENT and PERT_CURVE and PERT_CENTROID and PERT_ORIENTATION:
+        loop_label = f"Sigma_curve={SIGMA_CURVE_OOS:.3f};L_curve={L_CURVE_OOS:.3f},Sigma_current={SIGMA_CURRENT_OOS:.3f},Sigma_centroid={SIGMA_CENTROID_OOS:.3f}, Sigma_orientation={SIGMA_ORIENTATION_OOS:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURVE_OOS,L_CURVE_OOS,SIGMA_CURRENT_OOS,SIGMA_CENTROID_OOS) #relevant parameters to save correspond with saved data
+    elif PERT_CURRENT:
+        loop_label = f"Sigma_current={SIGMA_CURRENT_OOS:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURRENT_OOS) #relevant parameters to save correspond with saved data
+    elif PERT_CURVE:
+        loop_label = f"Sigma_curve={SIGMA_CURVE_OOS:.3f};L_curve={L_CURVE_OOS:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURVE_OOS,L_CURVE_OOS) #relevant parameters to save correspond with saved data
+    elif PERT_CENTROID:
+        loop_label = f"Sigma_centroid={SIGMA_CENTROID_OOS:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CENTROID_OOS) #relevant parameters to save correspond with saved data
+    elif PERT_ORIENTATION:
+        loop_label = f"Sigma_orientation={SIGMA_ORIENTATION_OOS:.3f}"
+        save_param = (SIGMA_ORIENTATION_OOS)
     print(loop_label)
     if slurm_array_int >= len(sigma_and_L_curves):
         raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(sigma_and_L_curves)} orders")
@@ -155,7 +170,7 @@ TEST_DIR = (Path(__file__).parent / ".." / ".." / "tests" / "test_files").resolv
 filename = TEST_DIR / config["surface_filename"]
 
 # Directory for output
-out_dir_path = f"0output_stage_two_optimization_{CONFIG_NAME}_{RUN_MODE}_"
+out_dir_path = f"output_stage_two_optimization_{CONFIG_NAME}_{RUN_MODE}_"
 
 if PERT_CURRENT and PERT_CURVE and PERT_CENTROID and PERT_ORIENTATION:
     out_dir_path += "_all"
