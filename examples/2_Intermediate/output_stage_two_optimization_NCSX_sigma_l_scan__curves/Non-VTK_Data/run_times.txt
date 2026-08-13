@@ -1,0 +1,8 @@
+Took 236.11 for run Sigma_curve=0.001;L_curve=0.500,Sigma_current=1000.000,Sigma_centroid=0.001.
+Took 226.14 for run Sigma_curve=0.007;L_curve=0.500,Sigma_current=7428.571,Sigma_centroid=0.007.
+Took 247.02 for run Sigma_curve=0.002;L_curve=0.500,Sigma_current=2285.714,Sigma_centroid=0.002.
+Took 255.68 for run Sigma_curve=0.004;L_curve=0.500,Sigma_current=3571.429,Sigma_centroid=0.004.
+Took 274.71 for run Sigma_curve=0.005;L_curve=0.500,Sigma_current=4857.143,Sigma_centroid=0.005.
+Took 285.12 for run Sigma_curve=0.006;L_curve=0.500,Sigma_current=6142.857,Sigma_centroid=0.006.
+Took 288.53 for run Sigma_curve=0.009;L_curve=0.500,Sigma_current=8714.286,Sigma_centroid=0.009.
+Took 288.78 for run Sigma_curve=0.010;L_curve=0.500,Sigma_current=10000.000,Sigma_centroid=0.010.

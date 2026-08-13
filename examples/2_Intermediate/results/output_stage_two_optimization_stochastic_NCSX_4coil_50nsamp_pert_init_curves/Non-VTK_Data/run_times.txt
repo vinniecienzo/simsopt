@@ -1,0 +1,10 @@
+Took 1343.60 for run 8.
+Took 1378.14 for run 9.
+Took 1386.08 for run 5.
+Took 1522.81 for run 0.
+Took 1558.51 for run 2.
+Took 1586.55 for run 4.
+Took 1608.49 for run 7.
+Took 1614.83 for run 6.
+Took 1619.45 for run 3.
+Took 1704.28 for run 1.

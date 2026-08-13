@@ -1,0 +1,56 @@
+ Run Sigma_curve=0.001;L_curve=0.500: 
+Flux Objective for exact coils     : 4.309e-06
+Out-of-sample flux value                  : 4.997e-06
+Objective Gradient (||∇J||)              : 2.344e-06
+Mean Flux Objective across perturbed coils: 4.969e-06
+Quality Number: 0.862
+<B_N>/<|B|> = 2.95e-03
+ Run Sigma_curve=0.002;L_curve=0.500: 
+Flux Objective for exact coils     : 4.395e-06
+Out-of-sample flux value                  : 7.864e-06
+Objective Gradient (||∇J||)              : 3.173e-06
+Mean Flux Objective across perturbed coils: 7.667e-06
+Quality Number: 0.559
+<B_N>/<|B|> = 2.92e-03
+ Run Sigma_curve=0.004;L_curve=0.500: 
+Flux Objective for exact coils     : 4.739e-06
+Out-of-sample flux value                  : 1.274e-05
+Objective Gradient (||∇J||)              : 1.213e-05
+Mean Flux Objective across perturbed coils: 1.225e-05
+Quality Number: 0.372
+<B_N>/<|B|> = 2.99e-03
+ Run Sigma_curve=0.005;L_curve=0.500: 
+Flux Objective for exact coils     : 5.158e-06
+Out-of-sample flux value                  : 1.939e-05
+Objective Gradient (||∇J||)              : 9.587e-06
+Mean Flux Objective across perturbed coils: 1.838e-05
+Quality Number: 0.266
+<B_N>/<|B|> = 3.09e-03
+ Run Sigma_curve=0.006;L_curve=0.500: 
+Flux Objective for exact coils     : 5.537e-06
+Out-of-sample flux value                  : 2.779e-05
+Objective Gradient (||∇J||)              : 1.678e-05
+Mean Flux Objective across perturbed coils: 2.587e-05
+Quality Number: 0.199
+<B_N>/<|B|> = 3.16e-03
+ Run Sigma_curve=0.007;L_curve=0.500: 
+Flux Objective for exact coils     : 6.280e-06
+Out-of-sample flux value                  : 3.771e-05
+Objective Gradient (||∇J||)              : 7.557e-05
+Mean Flux Objective across perturbed coils: 3.572e-05
+Quality Number: 0.167
+<B_N>/<|B|> = 3.33e-03
+ Run Sigma_curve=0.009;L_curve=0.500: 
+Flux Objective for exact coils     : 6.908e-06
+Out-of-sample flux value                  : 4.957e-05
+Objective Gradient (||∇J||)              : 2.262e-04
+Mean Flux Objective across perturbed coils: 4.564e-05
+Quality Number: 0.139
+<B_N>/<|B|> = 3.48e-03
+ Run Sigma_curve=0.010;L_curve=0.500: 
+Flux Objective for exact coils     : 7.435e-06
+Out-of-sample flux value                  : 6.294e-05
+Objective Gradient (||∇J||)              : 2.476e-04
+Mean Flux Objective across perturbed coils: 5.819e-05
+Quality Number: 0.118
+<B_N>/<|B|> = 3.59e-03

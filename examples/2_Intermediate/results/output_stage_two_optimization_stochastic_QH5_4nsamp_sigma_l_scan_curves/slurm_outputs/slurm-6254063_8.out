@@ -1,0 +1,33 @@
+SLURM job ID: 6254072
+Running sigma and l scan
+Traceback (most recent call last):
+  File "/scratch/vmg6966/simsopt/examples/2_Intermediate/stage_two_optimization_stochastic_all.py", line 110, in <module>
+    SIGMA_CURVE , L_CURVE = sigma_and_L_curves[slurm_array_int] #assign sigma and L using slurm array number
+                            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "/scratch/vmg6966/simsopt/examples/2_Intermediate/stage_two_optimization_stochastic_all.py", line 110, in <module>
+Traceback (most recent call last):
+  File "/scratch/vmg6966/simsopt/examples/2_Intermediate/stage_two_optimization_stochastic_all.py", line 110, in <module>
+  File "/scratch/vmg6966/simsopt/examples/2_Intermediate/stage_two_optimization_stochastic_all.py", line 110, in <module>
+    SIGMA_CURVE , L_CURVE = sigma_and_L_curves[slurm_array_int] #assign sigma and L using slurm array number
+        SIGMA_CURVE , L_CURVE = sigma_and_L_curves[slurm_array_int] #assign sigma and L using slurm array number
+SIGMA_CURVE , L_CURVE = sigma_and_L_curves[slurm_array_int] #assign sigma and L using slurm array number
+                            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^                            ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+^^^^^
+                            ~~~~~~~~IndexError: list index out of range
+IndexError: list index out of range
+~~~~~~~~~~^^^^^^^^^^^^^^^^^
+IndexError: list index out of range
+--------------------------------------------------------------------------
+Primary job  terminated normally, but 1 process returned
+a non-zero exit code. Per user-direction, the job has been aborted.
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+mpiexec detected that one or more processes exited with non-zero status, thus causing
+the job to be terminated. The first process to do so was:
+
+  Process name: [[46288,1],2]
+  Exit code:    1
+--------------------------------------------------------------------------

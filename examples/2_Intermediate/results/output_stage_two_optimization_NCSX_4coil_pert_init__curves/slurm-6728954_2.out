@@ -1,0 +1,46 @@
+SLURM job ID: 6728957
+Running initial guess perturbation scan
+2
+output_stage_two_optimization_NCSX_4coil_pert_init__curves
+
+################################################################################
+### Perform a Taylor test ######################################################
+################################################################################
+
+err -0.17263575679380438
+err -0.0018469359386654727
+err -1.7925640172222757e-05
+err -1.884284730468977e-07
+err -2.4938719977996016e-09
+
+################################################################################
+### Run the optimisation #######################################################
+################################################################################
+
+Finished 100/1000 Out-of-Sample Evaluations
+Finished 100/1000 Out-of-Sample Evaluations
+Finished 200/1000 Out-of-Sample Evaluations
+Finished 200/1000 Out-of-Sample Evaluations
+Finished 300/1000 Out-of-Sample Evaluations
+Finished 300/1000 Out-of-Sample Evaluations
+Finished 400/1000 Out-of-Sample Evaluations
+Finished 400/1000 Out-of-Sample Evaluations
+Finished 500/1000 Out-of-Sample Evaluations
+Finished 500/1000 Out-of-Sample Evaluations
+Finished 600/1000 Out-of-Sample Evaluations
+Finished 600/1000 Out-of-Sample Evaluations
+Finished 700/1000 Out-of-Sample Evaluations
+Finished 700/1000 Out-of-Sample Evaluations
+Finished 800/1000 Out-of-Sample Evaluations
+Finished 800/1000 Out-of-Sample Evaluations
+Finished 900/1000 Out-of-Sample Evaluations
+Finished 900/1000 Out-of-Sample Evaluations
+Finished 1000/1000 Out-of-Sample Evaluations
+Finished 1000/1000 Out-of-Sample Evaluations
+Flux Objective for exact coils    : 6.648e-05
+Out-of-sample flux value                  : 1.461e-04
+Objective Gradient (||∇J||)              : 9.606e-05
+Quality Number: 0.455
+<B_N>/<|B|> = 6.08e-03
+
+Took 412.6289234161377s

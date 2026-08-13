@@ -1,0 +1,70 @@
+ Run 9: 
+Flux Objective for exact coils     : 9.919e-06
+Out-of-sample flux value                  : 2.488e-05
+Objective Gradient (||∇J||)              : 6.562e-05
+Mean Flux Objective across perturbed coils: 1.726e-05
+Quality Number: 0.399
+<B_N>/<|B|> = 4.35e-03
+ Run 6: 
+Flux Objective for exact coils     : 9.892e-06
+Out-of-sample flux value                  : 2.485e-05
+Objective Gradient (||∇J||)              : 2.586e-05
+Mean Flux Objective across perturbed coils: 1.726e-05
+Quality Number: 0.398
+<B_N>/<|B|> = 4.35e-03
+ Run 7: 
+Flux Objective for exact coils     : 9.905e-06
+Out-of-sample flux value                  : 2.486e-05
+Objective Gradient (||∇J||)              : 2.820e-05
+Mean Flux Objective across perturbed coils: 1.725e-05
+Quality Number: 0.398
+<B_N>/<|B|> = 4.35e-03
+ Run 8: 
+Flux Objective for exact coils     : 9.916e-06
+Out-of-sample flux value                  : 2.487e-05
+Objective Gradient (||∇J||)              : 2.358e-05
+Mean Flux Objective across perturbed coils: 1.726e-05
+Quality Number: 0.399
+<B_N>/<|B|> = 4.35e-03
+ Run 5: 
+Flux Objective for exact coils     : 9.903e-06
+Out-of-sample flux value                  : 2.486e-05
+Objective Gradient (||∇J||)              : 3.544e-05
+Mean Flux Objective across perturbed coils: 1.726e-05
+Quality Number: 0.398
+<B_N>/<|B|> = 4.35e-03
+ Run 2: 
+Flux Objective for exact coils     : 9.946e-06
+Out-of-sample flux value                  : 2.491e-05
+Objective Gradient (||∇J||)              : 5.031e-05
+Mean Flux Objective across perturbed coils: 1.726e-05
+Quality Number: 0.399
+<B_N>/<|B|> = 4.36e-03
+ Run 4: 
+Flux Objective for exact coils     : 9.916e-06
+Out-of-sample flux value                  : 2.487e-05
+Objective Gradient (||∇J||)              : 8.801e-05
+Mean Flux Objective across perturbed coils: 1.725e-05
+Quality Number: 0.399
+<B_N>/<|B|> = 4.35e-03
+ Run 3: 
+Flux Objective for exact coils     : 9.921e-06
+Out-of-sample flux value                  : 2.488e-05
+Objective Gradient (||∇J||)              : 7.759e-05
+Mean Flux Objective across perturbed coils: 1.725e-05
+Quality Number: 0.399
+<B_N>/<|B|> = 4.35e-03
+ Run 1: 
+Flux Objective for exact coils     : 9.905e-06
+Out-of-sample flux value                  : 2.486e-05
+Objective Gradient (||∇J||)              : 4.043e-05
+Mean Flux Objective across perturbed coils: 1.725e-05
+Quality Number: 0.398
+<B_N>/<|B|> = 4.35e-03
+ Run 0: 
+Flux Objective for exact coils     : 9.874e-06
+Out-of-sample flux value                  : 2.483e-05
+Objective Gradient (||∇J||)              : 8.009e-05
+Mean Flux Objective across perturbed coils: 1.727e-05
+Quality Number: 0.398
+<B_N>/<|B|> = 4.34e-03

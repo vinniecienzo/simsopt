@@ -1,0 +1,47 @@
+/scratch/vmg6966/simsopt/examples/2_Intermediate/stochastic_helper_functions.py:26: SyntaxWarning: invalid escape sequence '\m'
+  \mathbf{c} = \frac{1}{L} \int_0^L \mathbf{\gamma}(l) dl
+SLURM job ID: 5890207
+Running normal mode
+output_stage_two_optimization_QH5_normal__curves
+
+################################################################################
+### Perform a Taylor test ######################################################
+################################################################################
+
+err -0.04420938016450826
+err -0.0004331448202132826
+err -2.4926490671539625e-06
+err -4.7843597972274665e-08
+err -2.7685431724933096e-09
+
+################################################################################
+### Run the optimisation #######################################################
+################################################################################
+
+Finished 100/1000 Out-of-Sample Evaluations
+Finished 100/1000 Out-of-Sample Evaluations
+Finished 200/1000 Out-of-Sample Evaluations
+Finished 200/1000 Out-of-Sample Evaluations
+Finished 300/1000 Out-of-Sample Evaluations
+Finished 300/1000 Out-of-Sample Evaluations
+Finished 400/1000 Out-of-Sample Evaluations
+Finished 400/1000 Out-of-Sample Evaluations
+Finished 500/1000 Out-of-Sample Evaluations
+Finished 500/1000 Out-of-Sample Evaluations
+Finished 600/1000 Out-of-Sample Evaluations
+Finished 600/1000 Out-of-Sample Evaluations
+Finished 700/1000 Out-of-Sample Evaluations
+Finished 700/1000 Out-of-Sample Evaluations
+Finished 800/1000 Out-of-Sample Evaluations
+Finished 800/1000 Out-of-Sample Evaluations
+Finished 900/1000 Out-of-Sample Evaluations
+Finished 900/1000 Out-of-Sample Evaluations
+Finished 1000/1000 Out-of-Sample Evaluations
+Finished 1000/1000 Out-of-Sample Evaluations
+Flux Objective for exact coils    : 3.320e-06
+Out-of-sample flux value                  : 2.363e-04
+Objective Gradient (||∇J||)              : 1.115e-04
+Quality Number: 0.014
+<B_N>/<|B|> = 1.21e-03
+
+Took 621.2205069065094s

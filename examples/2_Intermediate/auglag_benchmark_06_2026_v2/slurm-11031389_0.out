@@ -1,0 +1,67 @@
+No protocol specified
+
+Number of coils: 40
+Coils: Order: 20, no. 5. Iterations: Optimization Iters: 1500, Aug Lag Iters: 30Length Thresh:16.2, CS/CC Thresh:0.1,0.1, Curvature/MSC Thresh:16, 16.
+
+Taylor test passed
+Iter 1: Jf = 0.00e+00, c0 = 4.81e-02, c1 = 0.00e+00, c2 = 2.99e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 0.00e+00, 
+Iter 2: Jf = 0.00e+00, c0 = 1.58e-03, c1 = 1.98e-03, c2 = 6.53e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 1.52e-06, c6 = 0.00e+00, 
+Iter 3: Jf = 0.00e+00, c0 = 1.58e-03, c1 = 1.98e-03, c2 = 6.53e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 1.52e-06, c6 = 0.00e+00, 
+Iter 4: Jf = 0.00e+00, c0 = 1.58e-03, c1 = 1.98e-03, c2 = 6.53e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 1.52e-06, c6 = 0.00e+00, 
+Iter 5: Jf = 0.00e+00, c0 = 1.58e-03, c1 = 1.98e-03, c2 = 6.53e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 1.52e-06, c6 = 0.00e+00, 
+Iter 6: Jf = 0.00e+00, c0 = 6.23e-05, c1 = 0.00e+00, c2 = 6.32e-06, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 1.78e-05, c6 = 0.00e+00, 
+Iter 7: Jf = 0.00e+00, c0 = 3.29e-05, c1 = 0.00e+00, c2 = 1.10e-06, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 0.00e+00, 
+Iter 8: Jf = 0.00e+00, c0 = 3.29e-05, c1 = 0.00e+00, c2 = 1.10e-06, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 0.00e+00, 
+Iter 9: Jf = 0.00e+00, c0 = 3.29e-05, c1 = 0.00e+00, c2 = 1.10e-06, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 0.00e+00, 
+Iter 10: Jf = 0.00e+00, c0 = 2.46e-05, c1 = 0.00e+00, c2 = 5.26e-06, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 0.00e+00, 
+Iter 11: Jf = 0.00e+00, c0 = 2.46e-05, c1 = 0.00e+00, c2 = 5.26e-06, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 0.00e+00, 
+Iter 12: Jf = 0.00e+00, c0 = 2.46e-05, c1 = 0.00e+00, c2 = 5.26e-06, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 0.00e+00, 
+Iter 13: Jf = 0.00e+00, c0 = 2.46e-05, c1 = 0.00e+00, c2 = 5.26e-06, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 0.00e+00, 
+Iter 14: Jf = 0.00e+00, c0 = 2.46e-05, c1 = 0.00e+00, c2 = 5.26e-06, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 0.00e+00, 
+Iter 15: Jf = 0.00e+00, c0 = 2.46e-05, c1 = 0.00e+00, c2 = 5.26e-06, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 0.00e+00, 
+Iter 16: Jf = 0.00e+00, c0 = 1.81e-09, c1 = 4.51e-09, c2 = 1.99e-10, c3 = 7.23e-06, c4 = 7.50e-05, c5 = 5.82e-07, c6 = 0.00e+00, 
+Iter 17: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 18: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 19: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 20: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 21: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 22: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 23: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 24: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 25: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 26: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 27: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 28: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Iter 29: Jf = 0.00e+00, c0 = 4.83e-10, c1 = 0.00e+00, c2 = 1.30e-11, c3 = 1.19e-05, c4 = 6.66e-06, c5 = 3.03e-08, c6 = 0.00e+00, 
+Time taken: 2231.3914148807526 seconds
+Final CS-Sep constraint: 1.1869442807165234e-05
+Final CS-sep minimum distance: 0.06920761698124003
+Final CC-Sep constraint: 1.2991917625706763e-11
+Final CC-sep minimum distance: 0.09991522082970705
+Final Len constraint: ['3.2', '2.9', '3.0', '3.4', '3.7']
+Final Max Curvatures: [np.float64(16.024454598802393), np.float64(10.804643223613049), np.float64(10.043622589087372), np.float64(10.19882424422271), np.float64(8.422219377982334)]
+Final MSC constraint: ['16.00', '16.00', '16.00', '16.00', '16.00']
+Final Link constraint: 0
+Final Lengths: [Array(3.15374612, dtype=float64), Array(2.8796442, dtype=float64), Array(3.03281109, dtype=float64), Array(3.42106324, dtype=float64), Array(3.71261822, dtype=float64)] 16.199882865374725
+--------------------------------------------------------------------------------------------------------------------------------------------
+FINAL LAGRANGE MULTIPLIERS: [-3.71153920e+08 -5.46650627e+00 -1.00008525e+07 -8.49647790e+03
+ -4.76431547e+03 -2.22086171e+04 -0.00000000e+00]
+--------------------------------------------------------------------------------------------------------------------------------------------
+Final LOW RES NORMALIZED SQUARED FLUX: 4.827954493740877e-10
+Finished 100/1000 Out-of-Sample Evaluations
+Finished 200/1000 Out-of-Sample Evaluations
+Finished 300/1000 Out-of-Sample Evaluations
+Finished 400/1000 Out-of-Sample Evaluations
+Finished 500/1000 Out-of-Sample Evaluations
+Finished 600/1000 Out-of-Sample Evaluations
+Finished 700/1000 Out-of-Sample Evaluations
+Finished 800/1000 Out-of-Sample Evaluations
+Finished 900/1000 Out-of-Sample Evaluations
+Finished 1000/1000 Out-of-Sample Evaluations
+Flux Objective for exact coils    : 4.828e-10
+<B> : 2.674e-01
+High Res B_N: 3.209e-03
+Out-of-sample flux value                  : 4.803e-05
+<B_N>/<|B|> = 1.20e-02, Max BdotN/|B| = 1.31e-01
+Quality Number: 0.000
+

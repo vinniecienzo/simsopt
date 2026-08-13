@@ -1,0 +1,26 @@
+{
+ "script_variables": {
+  "MAXITER": 1000,
+  "order": 24
+ },
+ "json_variables": {
+  "ncoils": 4,
+  "R0": 1.0,
+  "R1": 0.5,
+  "LENGTH_WEIGHT": 5e-05,
+  "LENGTH_THRESHOLD": 15.5,
+  "CC_THRESHOLD": 0.1,
+  "CC_WEIGHT": 100,
+  "CS_THRESHOLD": 0.1,
+  "CS_WEIGHT": 0.0004,
+  "CURVATURE_THRESHOLD": 5.0,
+  "CURVATURE_WEIGHT": 1e-06,
+  "MSC_THRESHOLD": 5,
+  "MSC_WEIGHT": 1e-06,
+  "ARCLENGTH_WEIGHT": 0.01,
+  "FORCE_WEIGHT": 0,
+  "LINK_WEIGHT": 1,
+  "surface_method": "from_vmec_input",
+  "surface_filename": "input.LandremanPaul2021_QA"
+ }
+}

@@ -1,0 +1,56 @@
+Run Sigma_curve=0.001;L_curve=0.500,Sigma_current=1000.000,Sigma_centroid=0.001: 
+Flux Objective for exact coils    : 2.494e-04
+Out-of-sample flux value                  : 2.517e-04
+Objective Gradient (||∇J||)              : 1.253e-05
+Quality Number: 0.991
+<B_N>/<|B|> = 1.65e-02
+
+Run Sigma_curve=0.007;L_curve=0.500,Sigma_current=7428.571,Sigma_centroid=0.007: 
+Flux Objective for exact coils    : 2.494e-04
+Out-of-sample flux value                  : 3.797e-04
+Objective Gradient (||∇J||)              : 1.253e-05
+Quality Number: 0.657
+<B_N>/<|B|> = 1.65e-02
+
+Run Sigma_curve=0.002;L_curve=0.500,Sigma_current=2285.714,Sigma_centroid=0.002: 
+Flux Objective for exact coils    : 2.494e-04
+Out-of-sample flux value                  : 2.616e-04
+Objective Gradient (||∇J||)              : 1.253e-05
+Quality Number: 0.953
+<B_N>/<|B|> = 1.65e-02
+
+Run Sigma_curve=0.004;L_curve=0.500,Sigma_current=3571.429,Sigma_centroid=0.004: 
+Flux Objective for exact coils    : 2.494e-04
+Out-of-sample flux value                  : 2.792e-04
+Objective Gradient (||∇J||)              : 1.253e-05
+Quality Number: 0.893
+<B_N>/<|B|> = 1.65e-02
+
+Run Sigma_curve=0.005;L_curve=0.500,Sigma_current=4857.143,Sigma_centroid=0.005: 
+Flux Objective for exact coils    : 2.494e-04
+Out-of-sample flux value                  : 3.047e-04
+Objective Gradient (||∇J||)              : 1.253e-05
+Quality Number: 0.818
+<B_N>/<|B|> = 1.65e-02
+
+Run Sigma_curve=0.006;L_curve=0.500,Sigma_current=6142.857,Sigma_centroid=0.006: 
+Flux Objective for exact coils    : 2.494e-04
+Out-of-sample flux value                  : 3.381e-04
+Objective Gradient (||∇J||)              : 1.253e-05
+Quality Number: 0.738
+<B_N>/<|B|> = 1.65e-02
+
+Run Sigma_curve=0.009;L_curve=0.500,Sigma_current=8714.286,Sigma_centroid=0.009: 
+Flux Objective for exact coils    : 2.494e-04
+Out-of-sample flux value                  : 4.286e-04
+Objective Gradient (||∇J||)              : 1.253e-05
+Quality Number: 0.582
+<B_N>/<|B|> = 1.65e-02
+
+Run Sigma_curve=0.010;L_curve=0.500,Sigma_current=10000.000,Sigma_centroid=0.010: 
+Flux Objective for exact coils    : 2.494e-04
+Out-of-sample flux value                  : 4.863e-04
+Objective Gradient (||∇J||)              : 1.253e-05
+Quality Number: 0.513
+<B_N>/<|B|> = 1.65e-02
+

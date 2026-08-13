@@ -1,0 +1,47 @@
+SLURM job ID: 6302122
+Running sigma and l scan
+Sigma_curve=0.006;L_curve=0.500,Sigma_current=6142.857,Sigma_centroid=0.006
+output_stage_two_optimization_QH5_sigma_l_scan__curves
+
+################################################################################
+### Perform a Taylor test ######################################################
+################################################################################
+
+WARNING:2026-04-15 13:28:49,540:jax._src.xla_bridge:852: An NVIDIA GPU may be present on this machine, but a CUDA-enabled jaxlib is not installed. Falling back to cpu.
+err -0.041790218202701235
+err -0.0004027523602772032
+err -3.718074663039417e-06
+err -2.652759500954005e-08
+err 4.0035381676517545e-09
+
+################################################################################
+### Run the optimisation #######################################################
+################################################################################
+
+Finished 100/1000 Out-of-Sample Evaluations
+Finished 100/1000 Out-of-Sample Evaluations
+Finished 200/1000 Out-of-Sample Evaluations
+Finished 200/1000 Out-of-Sample Evaluations
+Finished 300/1000 Out-of-Sample Evaluations
+Finished 300/1000 Out-of-Sample Evaluations
+Finished 400/1000 Out-of-Sample Evaluations
+Finished 400/1000 Out-of-Sample Evaluations
+Finished 500/1000 Out-of-Sample Evaluations
+Finished 500/1000 Out-of-Sample Evaluations
+Finished 600/1000 Out-of-Sample Evaluations
+Finished 600/1000 Out-of-Sample Evaluations
+Finished 700/1000 Out-of-Sample Evaluations
+Finished 700/1000 Out-of-Sample Evaluations
+Finished 800/1000 Out-of-Sample Evaluations
+Finished 800/1000 Out-of-Sample Evaluations
+Finished 900/1000 Out-of-Sample Evaluations
+Finished 900/1000 Out-of-Sample Evaluations
+Finished 1000/1000 Out-of-Sample Evaluations
+Finished 1000/1000 Out-of-Sample Evaluations
+Flux Objective for exact coils    : 3.815e-06
+Out-of-sample flux value                  : 3.319e-04
+Objective Gradient (||∇J||)              : 7.107e-05
+Quality Number: 0.011
+<B_N>/<|B|> = 1.27e-03
+
+Took 644.4019587039948s

@@ -55,7 +55,7 @@ OUT_DIR = "./auglag/"
 os.makedirs(OUT_DIR, exist_ok=True)
 
 # Define the test directory
-TEST_DIR = '/scratch/projects/kaptanoglulab/VG/simsopt/examples/2_Intermediate/inputs'
+TEST_DIR = '/scratch/vmg6966/simsopt/examples/2_Intermediate/inputs'
 
 # Define the filename
 filename = TEST_DIR + '/input.20210406-01-002-nfp4_QH_000_000240'
@@ -108,7 +108,7 @@ currents = [c.current for c in coils]
 print("Number of coils:", len(coils))
 
 # Define the upper and lower bounds for the constraints
-LENGTH_THRESHOLD = 20 # comically large length upper bound
+LENGTH_THRESHOLD = 16.2 # comically large length upper bound
 FLUX_THRESHOLD = 1e-15
 CC_THRESHOLD = 0.1
 CS_THRESHOLD = 0.1
@@ -135,7 +135,7 @@ s_plot.to_vtk(OUT_DIR + "surf_init", extra_data=pointData)
 
 # Define the individual terms objective function:
 bs.set_points(s.gamma().reshape((-1, 3)))
-Jf = SquaredFlux(s, bs, definition = 'normalized' ,threshold=FLUX_THRESHOLD)
+Jf = SquaredFlux(s, bs ,threshold=FLUX_THRESHOLD)
 Jls = [CurveLength(c) for c in base_curves]
 #Jl = sum(QuadraticPenalty(jj, LENGTH_THRESHOLD, "identity") for jj in Jls)
 Jccdist = CurveCurveDistance(curves, CC_THRESHOLD, num_basecurves=ncoils)
@@ -157,8 +157,8 @@ c_list = [Jf,
           Jcsdist,  
           sum(Jcs), 
           sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs),
-          # sum(Jals)
-          # Jlink
+          sum(Jals),
+          Jlink
           # Jforce
 ]
 
