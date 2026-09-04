@@ -1,0 +1,18 @@
+Run sigma_oos_scan_0: 
+Flux Objective for exact coils    : 3.320e-06
+Out-of-sample flux value                  : 1.252e-05
+Objective Gradient (||∇J||)              : 1.115e-04
+Quality Number: 0.265
+<B_N>/<|B|> = 1.21e-03
+
+Decoupled sigma_OOS scan (training sigma fixed):
+  sigma_OOS = 1.0000e-03  J_OOS = 1.2521e-05  Q = 0.2651
+  sigma_OOS = 1.5000e-03  J_OOS = 2.4042e-05  Q = 0.1381
+  sigma_OOS = 2.0000e-03  J_OOS = 4.0161e-05  Q = 0.0827
+  sigma_OOS = 2.5000e-03  J_OOS = 6.1131e-05  Q = 0.0543
+  sigma_OOS = 3.0000e-03  J_OOS = 8.6420e-05  Q = 0.0384
+  sigma_OOS = 3.5000e-03  J_OOS = 1.1650e-04  Q = 0.0285
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5137e-04  Q = 0.0219
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9094e-04  Q = 0.0174
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3629e-04  Q = 0.0141
+

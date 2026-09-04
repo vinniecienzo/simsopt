@@ -1,0 +1,142 @@
+SLURM job ID: 16960560
+Running sigma_OOS scan (evaluation sigma decoupled from training)
+  9 evaluation sigmas x N_OOS=1000 = 9000 Biot-Savart evaluations
+sigma_oos_scan_0
+output_stage_two_optimization_QH5_sigma_oos_scan__curves
+
+################################################################################
+### Perform a Taylor test ######################################################
+################################################################################
+
+err -0.04420938016450826
+err -0.0004331448202132826
+err -2.4926490671539625e-06
+err -4.7843597972274665e-08
+err -2.7685431724933096e-09
+
+################################################################################
+### Run the optimisation #######################################################
+################################################################################
+
+
+################################################################################
+### Out-of-sample evaluation ###################################################
+################################################################################
+
+sigma_OOS=0.0010  j=0  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  j=0  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  j=0  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  j=0  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  j=0  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  j=0  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  j=0  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  j=0  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  j=0  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  j=0  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0010 -> mean J_OOS = 1.2521e-05
+sigma_OOS=0.0015  j=0  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  j=0  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  j=0  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  j=0  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  j=0  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  j=0  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  j=0  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  j=0  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  j=0  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  j=0  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0015 -> mean J_OOS = 2.4042e-05
+sigma_OOS=0.0020  j=0  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  j=0  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  j=0  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  j=0  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  j=0  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  j=0  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  j=0  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  j=0  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  j=0  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  j=0  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0020 -> mean J_OOS = 4.0161e-05
+sigma_OOS=0.0025  j=0  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  j=0  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  j=0  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  j=0  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  j=0  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  j=0  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  j=0  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  j=0  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  j=0  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  j=0  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0025 -> mean J_OOS = 6.1131e-05
+sigma_OOS=0.0030  j=0  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  j=0  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  j=0  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  j=0  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  j=0  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  j=0  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  j=0  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  j=0  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  j=0  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  j=0  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0030 -> mean J_OOS = 8.6420e-05
+sigma_OOS=0.0035  j=0  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  j=0  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  j=0  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  j=0  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  j=0  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  j=0  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  j=0  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  j=0  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  j=0  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  j=0  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0035 -> mean J_OOS = 1.1650e-04
+sigma_OOS=0.0040  j=0  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  j=0  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  j=0  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  j=0  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  j=0  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  j=0  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  j=0  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  j=0  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  j=0  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  j=0  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0040 -> mean J_OOS = 1.5137e-04
+sigma_OOS=0.0045  j=0  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  j=0  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  j=0  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  j=0  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  j=0  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  j=0  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  j=0  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  j=0  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  j=0  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  j=0  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0045 -> mean J_OOS = 1.9094e-04
+sigma_OOS=0.0050  j=0  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  j=0  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  j=0  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  j=0  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  j=0  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  j=0  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  j=0  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  j=0  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  j=0  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  j=0  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0050 -> mean J_OOS = 2.3629e-04
+Flux Objective for exact coils    : 3.320e-06
+Out-of-sample flux value                  : 1.252e-05
+Objective Gradient (||∇J||)              : 1.115e-04
+Quality Number: 0.265
+<B_N>/<|B|> = 1.21e-03
+
+Decoupled sigma_OOS scan (training sigma fixed):
+  sigma_OOS = 1.0000e-03  J_OOS = 1.2521e-05  Q = 0.2651
+  sigma_OOS = 1.5000e-03  J_OOS = 2.4042e-05  Q = 0.1381
+  sigma_OOS = 2.0000e-03  J_OOS = 4.0161e-05  Q = 0.0827
+  sigma_OOS = 2.5000e-03  J_OOS = 6.1131e-05  Q = 0.0543
+  sigma_OOS = 3.0000e-03  J_OOS = 8.6420e-05  Q = 0.0384
+  sigma_OOS = 3.5000e-03  J_OOS = 1.1650e-04  Q = 0.0285
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5137e-04  Q = 0.0219
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9094e-04  Q = 0.0174
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3629e-04  Q = 0.0141
+
+Took 1032.5410587787628s
