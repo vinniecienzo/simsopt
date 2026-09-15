@@ -1,0 +1,10 @@
+Took 1373.05 for run Sigma_curve=0.0010;L_curve=0.500.
+Took 1393.53 for run Sigma_curve=0.0040;L_curve=0.500.
+Took 1676.42 for run Sigma_curve=0.0090;L_curve=0.500.
+Took 1680.56 for run Sigma_curve=0.0100;L_curve=0.500.
+Took 1843.69 for run Sigma_curve=0.0060;L_curve=0.500.
+Took 1845.57 for run Sigma_curve=0.0030;L_curve=0.500.
+Took 1853.68 for run Sigma_curve=0.0050;L_curve=0.500.
+Took 1863.99 for run Sigma_curve=0.0020;L_curve=0.500.
+Took 1888.36 for run Sigma_curve=0.0070;L_curve=0.500.
+Took 1954.48 for run Sigma_curve=0.0080;L_curve=0.500.

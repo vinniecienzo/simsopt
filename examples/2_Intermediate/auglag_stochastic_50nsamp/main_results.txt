@@ -1,0 +1,266 @@
+Flux Objective for exact coils    : 4.818e-07
+<B> : 1.209e-01
+High Res B_N: 7.750e-04
+Mean Flux Objective across perturbed coils: 5.513e-06
+Out-of-sample flux value                  : 7.145e-07
+<B_N>/<|B|> = 6.41e-03, Max BdotN/|B| = 3.19e-02
+Quality Number: 0.674
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 7.1455e-07  Q = 0.6742
+  sigma_OOS = 1.5000e-03  J_OOS = 1.0065e-06  Q = 0.4787
+  sigma_OOS = 2.0000e-03  J_OOS = 1.4158e-06  Q = 0.3403
+  sigma_OOS = 2.5000e-03  J_OOS = 1.9424e-06  Q = 0.2480
+  sigma_OOS = 3.0000e-03  J_OOS = 2.5874e-06  Q = 0.1862
+  sigma_OOS = 3.5000e-03  J_OOS = 3.3498e-06  Q = 0.1438
+  sigma_OOS = 4.0000e-03  J_OOS = 4.2331e-06  Q = 0.1138
+  sigma_OOS = 4.5000e-03  J_OOS = 5.2348e-06  Q = 0.0920
+  sigma_OOS = 5.0000e-03  J_OOS = 6.3568e-06  Q = 0.0758
+
+Flux Objective for exact coils    : 3.594e-07
+<B> : 8.778e-02
+High Res B_N: 1.109e-03
+Mean Flux Objective across perturbed coils: 3.403e-06
+Out-of-sample flux value                  : 5.034e-07
+<B_N>/<|B|> = 1.26e-02, Max BdotN/|B| = 7.86e-01
+Quality Number: 0.714
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 5.0343e-07  Q = 0.7139
+  sigma_OOS = 1.5000e-03  J_OOS = 6.8371e-07  Q = 0.5256
+  sigma_OOS = 2.0000e-03  J_OOS = 9.3656e-07  Q = 0.3837
+  sigma_OOS = 2.5000e-03  J_OOS = 1.2618e-06  Q = 0.2848
+  sigma_OOS = 3.0000e-03  J_OOS = 1.6603e-06  Q = 0.2165
+  sigma_OOS = 3.5000e-03  J_OOS = 2.1318e-06  Q = 0.1686
+  sigma_OOS = 4.0000e-03  J_OOS = 2.6781e-06  Q = 0.1342
+  sigma_OOS = 4.5000e-03  J_OOS = 3.2977e-06  Q = 0.1090
+  sigma_OOS = 5.0000e-03  J_OOS = 3.9926e-06  Q = 0.0900
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 1.410e-06
+<B> : 2.714e-01
+High Res B_N: 1.448e-03
+Mean Flux Objective across perturbed coils: 2.215e-05
+Out-of-sample flux value                  : 2.301e-06
+<B_N>/<|B|> = 5.33e-03, Max BdotN/|B| = 2.99e-02
+Quality Number: 0.613
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.3012e-06  Q = 0.6127
+  sigma_OOS = 1.5000e-03  J_OOS = 3.4177e-06  Q = 0.4125
+  sigma_OOS = 2.0000e-03  J_OOS = 4.9863e-06  Q = 0.2827
+  sigma_OOS = 2.5000e-03  J_OOS = 7.0014e-06  Q = 0.2014
+  sigma_OOS = 3.0000e-03  J_OOS = 9.4728e-06  Q = 0.1488
+  sigma_OOS = 3.5000e-03  J_OOS = 1.2397e-05  Q = 0.1137
+  sigma_OOS = 4.0000e-03  J_OOS = 1.5793e-05  Q = 0.0893
+  sigma_OOS = 4.5000e-03  J_OOS = 1.9633e-05  Q = 0.0718
+  sigma_OOS = 5.0000e-03  J_OOS = 2.3946e-05  Q = 0.0589
+
+Flux Objective for exact coils    : 8.468e-07
+<B> : 1.884e-01
+High Res B_N: 1.152e-03
+Mean Flux Objective across perturbed coils: 1.100e-05
+Out-of-sample flux value                  : 1.307e-06
+<B_N>/<|B|> = 6.11e-03, Max BdotN/|B| = 3.58e-02
+Quality Number: 0.648
+
+Decoupled sigma_OOS scan, coil shape errors only (training sigma fixed at 5.0000e-03):
+  sigma_OOS = 1.0000e-03  J_OOS = 1.3069e-06  Q = 0.6480
+  sigma_OOS = 1.5000e-03  J_OOS = 1.8834e-06  Q = 0.4496
+  sigma_OOS = 2.0000e-03  J_OOS = 2.6920e-06  Q = 0.3146
+  sigma_OOS = 2.5000e-03  J_OOS = 3.7320e-06  Q = 0.2269
+  sigma_OOS = 3.0000e-03  J_OOS = 5.0062e-06  Q = 0.1692
+  sigma_OOS = 3.5000e-03  J_OOS = 6.5130e-06  Q = 0.1300
+  sigma_OOS = 4.0000e-03  J_OOS = 8.2596e-06  Q = 0.1025
+  sigma_OOS = 4.5000e-03  J_OOS = 1.0239e-05  Q = 0.0827
+  sigma_OOS = 5.0000e-03  J_OOS = 1.2459e-05  Q = 0.0680
+

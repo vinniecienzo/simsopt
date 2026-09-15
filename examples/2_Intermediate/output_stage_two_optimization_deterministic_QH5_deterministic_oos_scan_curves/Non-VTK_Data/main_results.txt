@@ -1,0 +1,15 @@
+ Run deterministic: 
+Training                                  : DETERMINISTIC (sigma = 0)
+Flux Objective for exact coils            : 3.659e-06
+Objective Gradient (||∇J||)               : 4.410e-06
+<B_N>/<|B|> = 1.24e-03
+  sigma_OOS=1.0000e-03 m -> <J_b>=1.223e-05, std=2.514e-06, p95=1.685e-05, Q=0.299
+  sigma_OOS=2.0000e-03 m -> <J_b>=3.800e-05, std=1.007e-05, p95=5.662e-05, Q=0.096
+  sigma_OOS=3.0000e-03 m -> <J_b>=8.114e-05, std=2.280e-05, p95=1.234e-04, Q=0.045
+  sigma_OOS=4.0000e-03 m -> <J_b>=1.417e-04, std=4.076e-05, p95=2.168e-04, Q=0.026
+  sigma_OOS=5.0000e-03 m -> <J_b>=2.207e-04, std=6.441e-05, p95=3.366e-04, Q=0.017
+  sigma_OOS=6.0000e-03 m -> <J_b>=3.170e-04, std=9.371e-05, p95=4.904e-04, Q=0.012
+  sigma_OOS=7.0000e-03 m -> <J_b>=4.320e-04, std=1.291e-04, p95=6.689e-04, Q=0.008
+  sigma_OOS=8.0000e-03 m -> <J_b>=5.666e-04, std=1.713e-04, p95=8.879e-04, Q=0.006
+  sigma_OOS=9.0000e-03 m -> <J_b>=7.209e-04, std=2.210e-04, p95=1.140e-03, Q=0.005
+  sigma_OOS=1.0000e-02 m -> <J_b>=8.989e-04, std=2.788e-04, p95=1.428e-03, Q=0.004

@@ -1,0 +1,54 @@
+Flux Objective for exact coils    : 1.712e-07
+<B> : 2.325e-01
+High Res B_N: 4.442e-03
+Out-of-sample flux value                  : 1.382e-06
+<B_N>/<|B|> = 1.91e-02, Max BdotN/|B| = 1.09e-01
+Quality Number: 0.124
+
+Decoupled sigma_OOS scan (coil shape errors only):
+  sigma_OOS = 1.0000e-03  J_OOS = 1.3817e-06  Q = 0.1239
+  sigma_OOS = 1.5000e-03  J_OOS = 2.8948e-06  Q = 0.0591
+  sigma_OOS = 2.0000e-03  J_OOS = 5.0206e-06  Q = 0.0341
+  sigma_OOS = 2.5000e-03  J_OOS = 7.7503e-06  Q = 0.0221
+  sigma_OOS = 3.0000e-03  J_OOS = 1.1100e-05  Q = 0.0154
+  sigma_OOS = 3.5000e-03  J_OOS = 1.5070e-05  Q = 0.0114
+  sigma_OOS = 4.0000e-03  J_OOS = 1.9677e-05  Q = 0.0087
+  sigma_OOS = 4.5000e-03  J_OOS = 2.4891e-05  Q = 0.0069
+  sigma_OOS = 5.0000e-03  J_OOS = 3.0757e-05  Q = 0.0056
+
+Flux Objective for exact coils    : 9.713e-08
+<B> : 2.358e-01
+High Res B_N: 3.973e-03
+Out-of-sample flux value                  : 1.335e-06
+<B_N>/<|B|> = 1.69e-02, Max BdotN/|B| = 2.04e-01
+Quality Number: 0.073
+
+Decoupled sigma_OOS scan (coil shape errors only):
+  sigma_OOS = 1.0000e-03  J_OOS = 1.3349e-06  Q = 0.0728
+  sigma_OOS = 1.5000e-03  J_OOS = 2.8830e-06  Q = 0.0337
+  sigma_OOS = 2.0000e-03  J_OOS = 5.0567e-06  Q = 0.0192
+  sigma_OOS = 2.5000e-03  J_OOS = 7.8546e-06  Q = 0.0124
+  sigma_OOS = 3.0000e-03  J_OOS = 1.1290e-05  Q = 0.0086
+  sigma_OOS = 3.5000e-03  J_OOS = 1.5365e-05  Q = 0.0063
+  sigma_OOS = 4.0000e-03  J_OOS = 2.0100e-05  Q = 0.0048
+  sigma_OOS = 4.5000e-03  J_OOS = 2.5484e-05  Q = 0.0038
+  sigma_OOS = 5.0000e-03  J_OOS = 3.1551e-05  Q = 0.0031
+
+Flux Objective for exact coils    : 2.696e-04
+<B> : 2.652e-01
+High Res B_N: 7.147e-03
+Out-of-sample flux value                  : 2.704e-04
+<B_N>/<|B|> = 2.69e-02, Max BdotN/|B| = 1.50e-01
+Quality Number: 0.997
+
+Decoupled sigma_OOS scan (coil shape errors only):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.7039e-04  Q = 0.9969
+  sigma_OOS = 1.5000e-03  J_OOS = 2.7141e-04  Q = 0.9932
+  sigma_OOS = 2.0000e-03  J_OOS = 2.7281e-04  Q = 0.9881
+  sigma_OOS = 2.5000e-03  J_OOS = 2.7461e-04  Q = 0.9816
+  sigma_OOS = 3.0000e-03  J_OOS = 2.7680e-04  Q = 0.9738
+  sigma_OOS = 3.5000e-03  J_OOS = 2.7939e-04  Q = 0.9648
+  sigma_OOS = 4.0000e-03  J_OOS = 2.8238e-04  Q = 0.9546
+  sigma_OOS = 4.5000e-03  J_OOS = 2.8578e-04  Q = 0.9432
+  sigma_OOS = 5.0000e-03  J_OOS = 2.8957e-04  Q = 0.9309
+

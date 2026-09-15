@@ -1,0 +1,170 @@
+Number of coils: 40
+Coils: Order: 16, no. 5. Iterations: Optimization Iters: 1500, Aug Lag Iters: 30Length Thresh:15.6, CS/CC Thresh:0.1,0.1, Curvature/MSC Thresh:16, 16.
+
+Taylor test passed
+Iter 1: Jf = 0.00e+00, c0 = 5.86e-03, c1 = 0.00e+00, c2 = 9.87e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 1.11e-04, c6 = 8.49e-04, c7 = 0.00e+00, 
+Iter 2: Jf = 0.00e+00, c0 = 3.06e-03, c1 = 0.00e+00, c2 = 6.96e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 0.00e+00, c6 = 1.93e-04, c7 = 0.00e+00, 
+Iter 3: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 4: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 5: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 6: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 7: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 8: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 9: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 10: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 11: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 12: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 13: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 14: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 15: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 16: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 17: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 18: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 19: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 20: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 21: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 22: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 23: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 24: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 25: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 26: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 27: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 28: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Iter 29: Jf = 0.00e+00, c0 = 2.70e-04, c1 = 0.00e+00, c2 = 3.01e-04, c3 = 0.00e+00, c4 = 0.00e+00, c5 = 2.28e-07, c6 = 2.18e-05, c7 = 0.00e+00, 
+Time taken: 301.79583764076233 seconds
+Final CS-Sep constraint: 0
+Final CS-sep minimum distance: 0.13336359876816858
+Final CC-Sep constraint: 0.0003014197265986434
+Final CC-sep minimum distance: 0.003767767432455643
+Final Len constraint: ['3.0', '2.8', '3.1', '3.3', '3.3']
+Final Max Curvatures: [np.float64(8.81483050596496), np.float64(7.210907127097734), np.float64(8.729092020126272), np.float64(8.59383082156483), np.float64(8.599678060143853)]
+Final MSC constraint: ['16.00', '15.88', '14.91', '15.15', '15.55']
+Final Link constraint: 0
+Final Lengths: [Array(3.03055686, dtype=float64), Array(2.77661984, dtype=float64), Array(3.0686535, dtype=float64), Array(3.26686652, dtype=float64), Array(3.34279064, dtype=float64)] 15.485487373665995
+--------------------------------------------------------------------------------------------------------------------------------------------
+FINAL LAGRANGE MULTIPLIERS: [-2.07181578e+14 -7.20324493e-01 -2.31675523e+14 -0.00000000e+00
+ -0.00000000e+00 -4.38227386e+10 -1.67536825e+13 -0.00000000e+00]
+--------------------------------------------------------------------------------------------------------------------------------------------
+Final LOW RES NORMALIZED SQUARED FLUX: 0.0002695520602329004
+
+################################################################################
+### Out-of-sample evaluation (manufacturing errors only) #######################
+################################################################################
+
+sigma_OOS=0.0010  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0010  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0010 -> mean J_OOS = 2.7039e-04  Q = 0.9969
+sigma_OOS=0.0015  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0015  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0015 -> mean J_OOS = 2.7141e-04  Q = 0.9932
+sigma_OOS=0.0020  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0020  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0020 -> mean J_OOS = 2.7281e-04  Q = 0.9881
+sigma_OOS=0.0025  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0025  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0025 -> mean J_OOS = 2.7461e-04  Q = 0.9816
+sigma_OOS=0.0030  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0030  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0030 -> mean J_OOS = 2.7680e-04  Q = 0.9738
+sigma_OOS=0.0035  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0035  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0035 -> mean J_OOS = 2.7939e-04  Q = 0.9648
+sigma_OOS=0.0040  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0040  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0040 -> mean J_OOS = 2.8238e-04  Q = 0.9546
+sigma_OOS=0.0045  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0045  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0045 -> mean J_OOS = 2.8578e-04  Q = 0.9432
+sigma_OOS=0.0050  Finished 100/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  Finished 200/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  Finished 300/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  Finished 400/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  Finished 500/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  Finished 600/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  Finished 700/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  Finished 800/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  Finished 900/1000 Out-of-Sample Evaluations
+sigma_OOS=0.0050  Finished 1000/1000 Out-of-Sample Evaluations
+sigma_OOS = 0.0050 -> mean J_OOS = 2.8957e-04  Q = 0.9309
+Flux Objective for exact coils    : 2.696e-04
+<B> : 2.652e-01
+High Res B_N: 7.147e-03
+Out-of-sample flux value                  : 2.704e-04
+<B_N>/<|B|> = 2.69e-02, Max BdotN/|B| = 1.50e-01
+Quality Number: 0.997
+
+Decoupled sigma_OOS scan (coil shape errors only):
+  sigma_OOS = 1.0000e-03  J_OOS = 2.7039e-04  Q = 0.9969
+  sigma_OOS = 1.5000e-03  J_OOS = 2.7141e-04  Q = 0.9932
+  sigma_OOS = 2.0000e-03  J_OOS = 2.7281e-04  Q = 0.9881
+  sigma_OOS = 2.5000e-03  J_OOS = 2.7461e-04  Q = 0.9816
+  sigma_OOS = 3.0000e-03  J_OOS = 2.7680e-04  Q = 0.9738
+  sigma_OOS = 3.5000e-03  J_OOS = 2.7939e-04  Q = 0.9648
+  sigma_OOS = 4.0000e-03  J_OOS = 2.8238e-04  Q = 0.9546
+  sigma_OOS = 4.5000e-03  J_OOS = 2.8578e-04  Q = 0.9432
+  sigma_OOS = 5.0000e-03  J_OOS = 2.8957e-04  Q = 0.9309
+

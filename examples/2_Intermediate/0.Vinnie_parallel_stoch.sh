@@ -1,10 +1,10 @@
 #!/bin/bash
 #SBATCH --time=12:00:00
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=20000
+#SBATCH --cpus-per-task=16
+#SBATCH --mem=100G
 #SBATCH --account=torch_pr_292_courant
-#SBATCH --array=0
+#SBATCH --array=0-9
 #SBATCH --output=slurm_outputs/slurm-%A_%a.out
 #SBATCH --mail-type=END,FAIL
 #SBATCH --mail-user=vmg6966@nyu.edu   
@@ -16,4 +16,4 @@ export MKL_NUM_THREADS=1
 export PYTHONUNBUFFERED=1
 
 # Call the wrapper, letting it launch MPI
-/scratch/vmg6966/run-simsopt.bash mpiexec --oversubscribe -n 4 python stage_two_aug_lag_stoch.py
+/scratch/vmg6966/run-simsopt.bash mpiexec --oversubscribe -n 16 python stage_two_optimization_stochastic_sigma_mesh.py

@@ -1,0 +1,44 @@
+{
+ "script_variables": {
+  "SIGMA_CURVE": 0.002,
+  "L_CURVE": 0.5,
+  "N_SAMPLES": 50,
+  "N_OOS": 1000,
+  "MAXITER": 2000,
+  "order": 16,
+  "CONFIG_NAME": "QH5",
+  "SEED_TRAIN": 0,
+  "SEED_OOS": 1
+ },
+ "sigma_curve_oos_values": [
+  0.001,
+  0.002,
+  0.003,
+  0.004,
+  0.005,
+  0.006,
+  0.007,
+  0.008,
+  0.009000000000000001,
+  0.01
+ ],
+ "json_variables": {
+  "ncoils": 5,
+  "R0": 1,
+  "R1": 0.5,
+  "LENGTH_THRESHOLD": 12.31,
+  "LENGTH_WEIGHT": 0.001,
+  "CC_THRESHOLD": 0.084,
+  "CC_WEIGHT": 100,
+  "CS_THRESHOLD": 0.1,
+  "CS_WEIGHT": 10,
+  "CURVATURE_THRESHOLD": 13,
+  "CURVATURE_WEIGHT": 1e-06,
+  "MSC_THRESHOLD": 1.3,
+  "MSC_WEIGHT": 1.5e-08,
+  "ARCLENGTH_WEIGHT": 0.007,
+  "LINK_WEIGHT": 100,
+  "surface_method": "from_vmec_input",
+  "surface_filename": "input.20210406-01-002-nfp4_QH_000_000240"
+ }
+}

@@ -22,4 +22,4 @@ export PYTHONUNBUFFERED=1
 export PYTHONPATH=/scratch/vmg6966/simsopt/src:$PYTHONPATH
 
 #run file with activated environment first
-/scratch/vmg6966/run-simsopt.bash python stage_two_aug_lag.py
+/scratch/vmg6966/run-simsopt.bash python stage_two_aug_lag_+oos_scan.py
