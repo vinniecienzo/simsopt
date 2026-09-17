@@ -1,2 +1,0 @@
-Took 228.35 for run .
-Took 350.27 for run .

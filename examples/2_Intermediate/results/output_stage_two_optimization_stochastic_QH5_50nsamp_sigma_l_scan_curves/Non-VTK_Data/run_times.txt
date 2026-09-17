@@ -1,1 +1,0 @@
-Took 2146.11 for run Sigma_curve=0.001;L_curve=0.500.

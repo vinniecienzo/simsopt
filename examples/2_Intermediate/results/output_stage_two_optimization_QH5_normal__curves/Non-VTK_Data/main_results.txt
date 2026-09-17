@@ -1,7 +1,0 @@
-Run : 
-Flux Objective for exact coils    : 3.320e-06
-Out-of-sample flux value                  : 2.363e-04
-Objective Gradient (||∇J||)              : 1.115e-04
-Quality Number: 0.014
-<B_N>/<|B|> = 1.21e-03
-
