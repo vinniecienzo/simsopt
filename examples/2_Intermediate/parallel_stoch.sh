@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --time=6:00:00
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=4
 #SBATCH --mem=60000
 #SBATCH --account=torch_pr_292_courant
 #SBATCH --array=0
@@ -16,4 +16,4 @@ export MKL_NUM_THREADS=1
 export PYTHONUNBUFFERED=1
 
 # Call the wrapper, letting it launch MPI
-../../../run-simsopt.bash mpiexec --oversubscribe -n 16 python stage_two_optimization_stochastic_all_+OOS_Scan.py
+../../../run-simsopt.bash mpiexec --oversubscribe -n 4 python stage_two_optimization_stochastic_all.py

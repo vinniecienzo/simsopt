@@ -1,1 +1,0 @@
-Took 3661.98 for run sigma_oos_scan_0.
