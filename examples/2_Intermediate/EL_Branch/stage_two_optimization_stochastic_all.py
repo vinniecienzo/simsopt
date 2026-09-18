@@ -71,7 +71,7 @@ SIGMA_CURVE, L_CURVE = 5e-3, 0.5
 CURRENT_BASE = 1e5
 SIGMA_CURRENT = 1e-1 * CURRENT_BASE 
 SIGMA_CENTROID = 1e-2
-SIGMA_ORIENTATION = 3*np.pi/180
+SIGMA_ORIENTATION = 5*np.pi/180
 
 # Parameters for the iniital guess perturbation
 SIGMA_INITIAL_GUESS = 0
@@ -81,20 +81,23 @@ fourier_fit = False
 
 
 PERT_CURRENT = False
-PERT_CURVE = True
+PERT_CURVE = False
 PERT_CENTROID = False
-PERT_ORIENTATION = False
+PERT_ORIENTATION = True
 
 # Pick which configuration you want
+<<<<<<< HEAD:examples/2_Intermediate/EL_Branch/stage_two_optimization_stochastic_all.py
 CONFIG_NAME = "QH5" 
+=======
+>>>>>>> 05a59d71009f86083f1587b46e110193ff82aefe:examples/2_Intermediate/stage_two_optimization_stochastic_all.py
 
-RUN_MODE = 'normal'
+RUN_MODE = 'sigma_l_scan'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
     proc0_print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 5e-3 # Standard deviation for the initial guess perturbation
-    L_INITIAL_GUESS = 0.2 # Length scale for the initial guess perturbation
+    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
+    L_INITIAL_GUESS = 0.5 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
     proc0_print(loop_label)
@@ -112,9 +115,11 @@ elif RUN_MODE == 'sigma_l_scan':
     SIGMA_CURRENT = sigma_current_values[slurm_array_int]
     sigma_centroid_values = np.linspace(1e-3, 1e-2, 8)
     SIGMA_CENTROID = sigma_centroid_values[slurm_array_int]
-    if PERT_CURRENT and PERT_CURVE and PERT_CENTROID:
-        loop_label = f"Sigma_curve={SIGMA_CURVE:.3f};L_curve={L_CURVE:.3f},Sigma_current={SIGMA_CURRENT:.3f},Sigma_centroid={SIGMA_CENTROID:.3f}" #specify what to label results for each run
-        save_param = (SIGMA_CURVE,L_CURVE,SIGMA_CURRENT,SIGMA_CENTROID) #relevant parameters to save correspond with saved data
+    sigma_orientation_values = np.linspace(2,10,8)*np.pi/180
+    SIGMA_ORIENTATION = sigma_orientation_values[slurm_array_int]
+    if PERT_CURRENT and PERT_CURVE and PERT_CENTROID and PERT_ORIENTATION:
+        loop_label = f"Sigma_curve={SIGMA_CURVE:.3f};L_curve={L_CURVE:.3f},Sigma_current={SIGMA_CURRENT:.3f},Sigma_centroid={SIGMA_CENTROID:.3f},Sigma_orientation:{SIGMA_ORIENTATION:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURVE,L_CURVE,SIGMA_CURRENT,SIGMA_CENTROID,SIGMA_ORIENTATION) #relevant parameters to save correspond with saved data
     elif PERT_CURRENT:
         loop_label = f"Sigma_current={SIGMA_CURRENT:.3f}" #specify what to label results for each run
         save_param = (SIGMA_CURRENT) #relevant parameters to save correspond with saved data
@@ -124,6 +129,9 @@ elif RUN_MODE == 'sigma_l_scan':
     elif PERT_CENTROID:
         loop_label = f"Sigma_centroid={SIGMA_CENTROID:.3f}" #specify what to label results for each run
         save_param = (SIGMA_CENTROID) #relevant parameters to save correspond with saved data
+    elif PERT_ORIENTATION:
+        loop_label = f"Sigma_orientation={SIGMA_ORIENTATION:.3f}" 
+        save_param = (SIGMA_ORIENTATION)
     proc0_print(loop_label)
     if slurm_array_int >= len(sigma_and_L_curves):
         raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(sigma_and_L_curves)} orders")
