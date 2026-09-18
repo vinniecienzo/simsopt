@@ -54,10 +54,11 @@ slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
 order = 16
 
 # Number of samples to approximate the mean
-N_SAMPLES = 4
+N_SAMPLES = 512
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
+<<<<<<< HEAD:examples/2_Intermediate/EL_Branch/stage_two_optimization_stochastic.py
 SIGMA, L = 5e-3, 0.5
 
 # Pick which configuration you want
@@ -111,6 +112,10 @@ else:
     raise ValueError("No run mode defined")
 
     
+=======
+SIGMA, L = 2.29e-3, 0.5
+
+>>>>>>> VG_St_Aug_Lag:examples/2_Intermediate/stage_two_optimization_stochastic.py
 # Out-of-sample evaluation parameters
 N_OOS = 1000
 SIGMA_OOS = SIGMA
@@ -119,9 +124,59 @@ L_OOS = L
 # Number of iterations to perform:
 MAXITER = 50 if in_github_actions else 2000
 
+# Pick which configuration you want
+CONFIG_NAME = "QH5" 
+
+RUN_MODE = 'normal'
+
 #######################################################
 # End of input parameters.
 #######################################################
+
+if RUN_MODE == 'pert_init':
+    # Initial guess perturbation parameters
+    proc0_print("Running initial guess perturbation scan")
+    SIGMA_INITIAL_GUESS = SIGMA # Standard deviation for the initial guess perturbation
+    L_INITIAL_GUESS = L # Length scale for the initial guess perturbation
+    fourier_fit = False #use curves with perturbed fourier coefficients
+    loop_label = slurm_array_int #specify what to label results for each run
+    proc0_print(loop_label)
+    seed_initial_guess = slurm_array_int #assign seed using slurm array number
+    save_param = slurm_array_int #relevant parameters to save correspond with saved data
+    
+elif RUN_MODE == 'sigma_l_scan':
+    #scan sigma and L values for optimization
+    proc0_print("Running sigma and l scan")
+    sigma_values = np.linspace(1e-3, 1e-2, 8) #sigma values to scan
+    L_values = np.linspace(0.5, 0.5, 1) #L values to scan
+    sigma_and_L = [(sigma, L) for sigma in sigma_values for L in L_values] #pairs of sigma and L
+    SIGMA, L= sigma_and_L[slurm_array_int] #assign sigma and L using slurm array number
+    loop_label = f"Sigma={SIGMA:.3f};L={L:.3f}" #specify what to label results for each run
+    save_param = (SIGMA,L) #relevant parameters to save correspond with saved data
+    proc0_print(loop_label)
+    if slurm_array_int >= len(sigma_and_L):
+        raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(sigma_and_L)} orders")
+    
+elif RUN_MODE == 'order_scan':
+    #scan order values 
+    proc0_print("Running order scan")
+    order_values = [int(i) for i in range(4,36,4)] #order values to scan
+    order = order_values[slurm_array_int] #assign order using slurm array number
+    loop_label = f"order={order}" #specify what to label results for each run
+    save_param = order #relevant parameters to save correspond with saved data
+    proc0_print(loop_label)
+    if slurm_array_int >= len(order_values):
+        raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(order_values)} orders")
+    
+elif RUN_MODE == 'normal':
+    #Run one optimization, no scanning
+    proc0_print("Running normal mode")
+    loop_label = ""
+    save_param = 0
+    
+else:
+    #no proper run mode defined --> dont execute code
+    raise ValueError("No run mode defined")
 
 #load configuration
 with open("000.input_parameters.json") as f:
@@ -223,7 +278,7 @@ bs = BiotSavart(coils)
 
 curves = [c.curve for c in coils]
 currents = [c.current for c in coils]
-curves_to_vtk(curves, OUT_DIR / f"curves_init_{loop_label}")
+#curves_to_vtk(curves, OUT_DIR / f"curves_init_{loop_label}")
 
 bs.set_points(s_plot.gamma().reshape((-1, 3)))
 pointData = {"B_N": np.sum(bs.B().reshape((qphi, qtheta, 3)) * s_plot.unitnormal(), axis=2)[:, :, None]}
@@ -383,6 +438,7 @@ main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
 
 proc0_print(main_results_str)
 
+<<<<<<< HEAD:examples/2_Intermediate/EL_Branch/stage_two_optimization_stochastic.py
 <<<<<<< HEAD:examples/2_Intermediate/stage_two_optimization_stochastic.py
 with open(SUB_DIR / 'main_results.txt', 'a') as f:
     f.write(f"Run {loop_label}: \n" + main_results_str)
@@ -394,16 +450,23 @@ if MPI.COMM_WORLD.rank == 0:
     with open(SUB_DIR / 'main_results.txt', 'a') as f:
         f.write(f"Run {loop_label}: \n" + main_results_str)    
 >>>>>>> EL_1:examples/2_Intermediate/EL_Branch/stage_two_optimization_stochastic.py
+=======
+with open(SUB_DIR / 'main_results.txt', 'a') as f:
+    f.write(f"Run {loop_label}: \n" + main_results_str)
+>>>>>>> VG_St_Aug_Lag:examples/2_Intermediate/stage_two_optimization_stochastic.py
 
-    #save data as array for plotting
-    np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
-            saved_parameter = save_param,
-            sq_flux_value = Jf.J(),
-            perturbed_sq_flux_data = squared_flux_data,
-            gradient = np.linalg.norm(JF.dJ())
-            )
+#save data as array for plotting
+np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
+         saved_parameter = save_param,
+         sq_flux_value = Jf.J(),
+         perturbed_sq_flux_data = squared_flux_data,
+         gradient = np.linalg.norm(JF.dJ())
+         )
 
+<<<<<<< HEAD:examples/2_Intermediate/EL_Branch/stage_two_optimization_stochastic.py
 <<<<<<< HEAD:examples/2_Intermediate/stage_two_optimization_stochastic.py
+=======
+>>>>>>> VG_St_Aug_Lag:examples/2_Intermediate/stage_two_optimization_stochastic.py
 #Save objective function values from outstr in fun() wrapper function
 with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
     f.write(f"Run {loop_label}: \n" + last_outstr + "\n")
@@ -412,6 +475,7 @@ with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
 # Just specify the variable names you want
 save_vars = ['SIGMA', 'L', 'MAXITER'
              ]
+<<<<<<< HEAD:examples/2_Intermediate/EL_Branch/stage_two_optimization_stochastic.py
 =======
     #Save objective function values from outstr in fun() wrapper function
     with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
@@ -422,21 +486,23 @@ save_vars = ['SIGMA', 'L', 'MAXITER'
     save_vars = ['SIGMA', 'L', 'MAXITER'
                 ]
 >>>>>>> EL_1:examples/2_Intermediate/EL_Branch/stage_two_optimization_stochastic.py
+=======
 
-    # Combine both
-    params = {
-        'script_variables': {name: eval(name) for name in save_vars if name in locals() or name in globals()},
-        'json_variables': {k: v for k, v in config.items()},
-    }
+# Combine both
+params = {
+    'script_variables': {name: eval(name) for name in save_vars if name in locals() or name in globals()},
+    'json_variables': {k: v for k, v in config.items()},
+}
+>>>>>>> VG_St_Aug_Lag:examples/2_Intermediate/stage_two_optimization_stochastic.py
 
-    with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
-        json.dump(params, f, indent=1)
-        
-    end = time.time()
-    time_taken = f"Took {(end - start):.2f} for run {loop_label}."
+with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
+    json.dump(params, f, indent=1)
+    
+end = time.time()
+time_taken = f"Took {(end - start):.2f} for run {loop_label}."
 
-    #Save run times
-    with open(SUB_DIR / 'run_times.txt', 'a') as f:
-                f.write(time_taken + "\n")
+#Save run times
+with open(SUB_DIR / 'run_times.txt', 'a') as f:
+            f.write(time_taken + "\n")
             
 proc0_print(time_taken)

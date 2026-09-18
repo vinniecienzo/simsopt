@@ -220,8 +220,8 @@ class CurvePerturbed_jsonfix(sopp.Curve, Curve):
                 stell = []
                 for c in curves:
                     pert = PerturbationSample(sampler_systematic, randomgen=rg)
-                    stell.append(CurvePerturbed_json_fix(c, pert))
                 perturbed_curves.append(stell)
+		stell.append(CurvePerturbed_jsonfix(c, pert))
         """
         self.curve = curve
         sopp.Curve.__init__(self, curve.quadpoints)
@@ -328,4 +328,5 @@ def curve_fourier_fit(base_curves_pert,s,order):
     print(f"Mean fit error: {np.mean(fit_error):.6f}")
 
     # return fitted curves and the mean fit error
-    return base_curves_fit, np.mean(fit_error)
+
+    stell.append(CurvePerturbed_jsonfix(c, pert))
