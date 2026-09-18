@@ -32,72 +32,109 @@ from simsopt.field import BiotSavart, Current, Coil, coils_via_symmetries
 from simsopt.geo import (SurfaceRZFourier, curves_to_vtk, create_equally_spaced_curves,
                          CurveLength, CurveCurveDistance, MeanSquaredCurvature,
                          LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation,
-                         GaussianSampler, CurvePerturbed_json_fix,
-                         PerturbationSample, LinkingNumber) # CurrentPerturbed removed should not affect EW1
+                         GaussianSampler, CurvePerturbed, 
+                         PerturbationSample, LinkingNumber)
 from simsopt.objectives import Weight, SquaredFlux, QuadraticPenalty
-from simsopt.util import in_github_actions,proc0_print, comm_world 
+from simsopt.util import in_github_actions
+from simsopt.field.force import coil_force, LpCurveForce
+from simsopt.field.selffield import regularization_circ
 from stochastic_helper_functions import *
 
 start = time.time()
 
 # assign slurm array job number to variable
 slurm_array_int = int(os.environ.get("SLURM_ARRAY_TASK_ID", 0))
+job_id = int(os.environ.get("SLURM_JOB_ID", 0))
+print(f"SLURM job ID: {job_id}")
 
 # Number of Fourier modes describing each Cartesian component of each coil:
-order = 16
+order = 24
 
 # Number of samples for out-of-sample evaluation
 N_OOS = 1000
 
 # Standard deviation for the coil errors
 # Length scale for the coil errors
-SIGMA_OOS, L_OOS = 5e-3, 0.5
+# Perturbations applied to coil positions and currents
+SIGMA_CURVE_OOS, L_CURVE_OOS = 1e-2, 0.5
+CURRENT_BASE = 1e5
+SIGMA_CURRENT_OOS = 1e-1 * CURRENT_BASE
+SIGMA_CENTROID_OOS = 1e-2
+SIGMA_ORIENTATION_OOS = 5*np.pi/180
+
+# Parameters for the iniital guess perturbation
+SIGMA_INITIAL_GUESS = 0
+L_INITIAL_GUESS = 0.2
+SEED_INITIAL_GUESS = 0
+fourier_fit = False
+
+PERT_CURRENT = False
+PERT_CURVE = False
+PERT_CENTROID = False
+PERT_ORIENTATION = True
 
 # Choose and load input parameters from configuration
-CONFIG_NAME = "QH5"
+CONFIG_NAME = "QA" 
 
-RUN_MODE = 'pert_init'
+RUN_MODE = 'sigma_l_scan'
 
 if RUN_MODE == 'pert_init':
     # Initial guess perturbation parameters
-    proc0_print("Running initial guess perturbation scan")
-    SIGMA_INITIAL_GUESS = 5e-3 # Standard deviation for the initial guess perturbation
+    print("Running initial guess perturbation scan")
+    SIGMA_INITIAL_GUESS = 1e-2 # Standard deviation for the initial guess perturbation
     L_INITIAL_GUESS = 0.5 # Length scale for the initial guess perturbation
     fourier_fit = False #use curves with perturbed fourier coefficients
     loop_label = slurm_array_int #specify what to label results for each run
-    proc0_print(loop_label)
-    seed_initial_guess = slurm_array_int #assign seed using slurm array number
+    print(loop_label)
+    SEED_INITIAL_GUESS = slurm_array_int #assign seed using slurm array number
     save_param = slurm_array_int #relevant parameters to save correspond with saved data
         
 elif RUN_MODE == 'sigma_l_scan':
     #scan sigma and L values for optimization
-    proc0_print("Running sigma and l scan")
-    sigma_values = np.linspace(1e-3, 1e-2, 8) #sigma values to scan
-    L_values = np.linspace(0.5, 0.5, 1) #L values to scan
-    sigma_and_L = [(sigma, L) for sigma in sigma_values for L in L_values] #pairs of sigma and L
-
-    if slurm_array_int >= len(sigma_and_L):
-        raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(sigma_and_L)} orders")
-
-    SIGMA_OOS, L_OOS = sigma_and_L[slurm_array_int] #assign sigma and L using slurm array number
-    loop_label = slurm_array_int #specify what to label results for each run
-    save_param = (SIGMA_OOS,L_OOS) #relevant parameters to save correspond with saved data
-    proc0_print(loop_label)
+    print("Running sigma and l scan")
+    sigma_curves_values = np.linspace(1e-3, 1e-2, 8) #sigma values to scan
+    L_curves_values = np.linspace(0.5, 0.5, 1) #L values to scan
+    sigma_and_L_curves = [(sigma, L) for sigma in sigma_curves_values for L in L_curves_values] #pairs of sigma and L
+    SIGMA_CURVE_OOS, L_CURVE_OOS = sigma_and_L_curves[slurm_array_int] #assign sigma and L using slurm array number
+    sigma_current_values = np.linspace(1e-2, 1e-1, 8) * CURRENT_BASE
+    SIGMA_CURRENT_OOS = sigma_current_values[slurm_array_int]
+    sigma_centroid_values = np.linspace(1e-3, 1e-2, 8)
+    SIGMA_CENTROID_OOS = sigma_centroid_values[slurm_array_int]
+    sigma_orientation_values = np.linspace(2,10,8)*np.pi/180
+    SIGMA_ORIENTATION_OOS = sigma_orientation_values[slurm_array_int]
+    if PERT_CURRENT and PERT_CURVE and PERT_CENTROID and PERT_ORIENTATION:
+        loop_label = f"Sigma_curve={SIGMA_CURVE_OOS:.3f};L_curve={L_CURVE_OOS:.3f},Sigma_current={SIGMA_CURRENT_OOS:.3f},Sigma_centroid={SIGMA_CENTROID_OOS:.3f}, Sigma_orientation={SIGMA_ORIENTATION_OOS:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURVE_OOS,L_CURVE_OOS,SIGMA_CURRENT_OOS,SIGMA_CENTROID_OOS) #relevant parameters to save correspond with saved data
+    elif PERT_CURRENT:
+        loop_label = f"Sigma_current={SIGMA_CURRENT_OOS:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURRENT_OOS) #relevant parameters to save correspond with saved data
+    elif PERT_CURVE:
+        loop_label = f"Sigma_curve={SIGMA_CURVE_OOS:.3f};L_curve={L_CURVE_OOS:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CURVE_OOS,L_CURVE_OOS) #relevant parameters to save correspond with saved data
+    elif PERT_CENTROID:
+        loop_label = f"Sigma_centroid={SIGMA_CENTROID_OOS:.3f}" #specify what to label results for each run
+        save_param = (SIGMA_CENTROID_OOS) #relevant parameters to save correspond with saved data
+    elif PERT_ORIENTATION:
+        loop_label = f"Sigma_orientation={SIGMA_ORIENTATION_OOS:.3f}"
+        save_param = (SIGMA_ORIENTATION_OOS)
+    print(loop_label)
+    if slurm_array_int >= len(sigma_and_L_curves):
+        raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(sigma_and_L_curves)} orders")
     
 elif RUN_MODE == 'order_scan':
     #scan order values 
-    proc0_print("Running order scan")
+    print("Running order scan")
     order_values = [int(i) for i in range(4,36,4)] #order values to scan
     order = order_values[slurm_array_int] #assign order using slurm array number
     loop_label = f"order={order}" #specify what to label results for each run
     save_param = order #relevant parameters to save to correspond with saved data
-    proc0_print(loop_label)
+    print(loop_label)
     if slurm_array_int >= len(order_values):
         raise ValueError(f"SLURM_ARRAY_TASK_ID {slurm_array_int} out of range for {len(order_values)} orders")
 
 elif RUN_MODE == 'normal':
     #Run one optimization, no scanning
-    proc0_print("Running normal mode")
+    print("Running normal mode")
     loop_label = ""
     save_param = 0
     
@@ -105,6 +142,10 @@ else:
     #no proper run mode defined --> dont execute code
     raise ValueError("No run mode defined")
 
+SIGMA_CURRENT_OOS = SIGMA_CURRENT_OOS if PERT_CURRENT else 0
+SIGMA_CURVE_OOS = SIGMA_CURVE_OOS if PERT_CURVE else 0
+SIGMA_CENTROID_OOS = SIGMA_CENTROID_OOS if PERT_CENTROID else 0
+SIGMA_ORIENTATION_OOS = SIGMA_ORIENTATION_OOS if PERT_ORIENTATION else 0
 
 # Number of iterations to perform:
 MAXITER = 50 if in_github_actions else 1000
@@ -114,7 +155,7 @@ MAXITER = 50 if in_github_actions else 1000
 #######################################################
 
 #load configuration
-with open("000.input_parameters.json") as f:
+with open("input_parameters.json") as f:
     all_configs = json.load(f)
 config = all_configs[CONFIG_NAME]
 globals().update(config)  # Assign all keys as variables
@@ -129,15 +170,26 @@ TEST_DIR = (Path(__file__).parent / ".." / ".." / "tests" / "test_files").resolv
 filename = TEST_DIR / config["surface_filename"]
 
 # Directory for output
-out_dir_path = f"output_stage_two_optimization_curves_{CONFIG_NAME}_{RUN_MODE}"
+out_dir_path = f"output_stage_two_optimization_{CONFIG_NAME}_{RUN_MODE}_"
 
+if PERT_CURRENT and PERT_CURVE and PERT_CENTROID and PERT_ORIENTATION:
+    out_dir_path += "_all"
+if PERT_CURRENT:
+    out_dir_path += "_currents"
+if PERT_CURVE:
+    out_dir_path += "_curves"
+if PERT_CENTROID:
+    out_dir_path += "_centroids"
+if PERT_ORIENTATION:
+    out_dir_path += "_orientations"
+    
 if RUN_MODE == 'pert_init':
     if fourier_fit == True:
         out_dir_path += "_ffit"
     
 if MAXITER != 1000:
     out_dir_path += f"_{MAXITER/1000}kiter"
-    
+print(out_dir_path)
 OUT_DIR = Path(out_dir_path)
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -146,7 +198,9 @@ OUT_DIR.mkdir(parents=True, exist_ok=True)
 SUB_DIR = OUT_DIR / "Non-VTK_Data"
 SUB_DIR.mkdir(parents=True, exist_ok=True)
 
-
+#Subdirectory for checking perturbed objects
+SUB_PERT_DIR = OUT_DIR / "Pert_Data"
+SUB_PERT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Initialize the boundary magnetic surface:
 nphi = 64
@@ -178,21 +232,19 @@ base_curves_init = create_equally_spaced_curves(ncoils, s.nfp, stellsym=True, R0
 curves_to_vtk(base_curves_init, OUT_DIR / f"base_curves_init")
     
 # Perturb coils
-if RUN_MODE == "pert_init":
+if SIGMA_INITIAL_GUESS != 0:
     
-
-    rg_initial_guess = Generator(PCG64DXSM(seed_initial_guess))
+    rg_initial_guess = Generator(PCG64DXSM(SEED_INITIAL_GUESS))
     sampler_initial_guess = GaussianSampler(base_curves_init[0].quadpoints, SIGMA_INITIAL_GUESS, L_INITIAL_GUESS, n_derivs=2)
     base_curves_pert = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler_initial_guess, randomgen=rg_initial_guess)) for c in base_curves_init]
 
     # show initial base coil after perturbation
-    curves_to_vtk(base_curves_pert, OUT_DIR / f"base_curves_init_perturbed_{loop_label}")
+    curves_to_vtk(base_curves_pert, SUB_PERT_DIR / f"base_curves_init_perturbed_{loop_label}")
 
     #fit fourier
     if fourier_fit == True: 
         base_curves, error = curve_fourier_fit(base_curves_pert, s, order)
-        # show initial base coil after perturbation from fourier fit
-        curves_to_vtk(base_curves, OUT_DIR / f"base_curves_init_perturbed_ffit_{loop_label}")
+        curves_to_vtk(base_curves, SUB_PERT_DIR / f"base_curves_fit{loop_label}")
     else:
         base_curves = base_curves_pert
         
@@ -244,7 +296,7 @@ JF = Jf \
     + MSC_WEIGHT * sum(QuadraticPenalty(J, MSC_THRESHOLD, "max") for J in Jmscs) \
     + ARCLENGTH_WEIGHT * sum(Jals) \
     + CS_WEIGHT * Jcsdist \
-    + LINK_WEIGHT * linkNum
+    + linkNum
 
 #J_LENGTH_PENALTY = LENGTH_CON_WEIGHT * sum([QuadraticPenalty(Jls[i], LENGTH_THRESHOLD) for i in range(len(base_curves))])
 # We don't have a general interface in SIMSOPT for optimisation problems that
@@ -261,7 +313,8 @@ def fun(dofs):
     jf = Jf.J()
     currents = JF.x[:ncoils-1]
     BdotN = np.mean(np.abs(np.sum(bs.B().reshape((nphi, ntheta, 3)) * s.unitnormal(), axis=2)))
-    outstr = f"Iteration {iteration_counter}/{MAXITER}-----\n" #outstr += f"currents: {currents}\n"
+    outstr = f"Iteration {iteration_counter}/{MAXITER}-----\n"
+    outstr += f"currents: {currents}\n"
     outstr += f"J={J:.1e}, Jf={jf:.1e}, ⟨B·n⟩={BdotN:.1e}"
     cl_string = ", ".join([f"{J.J():.1f}" for J in Jls])
     kap_string = ", ".join(f"{np.max(c.kappa()):.1f}" for c in base_curves)
@@ -270,11 +323,11 @@ def fun(dofs):
     outstr += f", C-C-Sep={Jccdist.shortest_distance():.2f}"
     outstr += f", ║∇J║={np.linalg.norm(grad):.1e}"
     last_outstr = outstr
-    proc0_print(outstr)
+    # print(outstr)
     return J, grad
 
 
-proc0_print("""
+print("""
 ################################################################################
 ### Perform a Taylor test ######################################################
 ################################################################################
@@ -283,6 +336,7 @@ proc0_print("""
 f = fun
 dofs = JF.x
 
+
 np.random.seed(1)
 h = np.random.uniform(size=dofs.shape)
 J0, dJ0 = f(dofs)
@@ -290,9 +344,22 @@ dJh = sum(dJ0 * h)
 for eps in [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]:
     J1, _ = f(dofs + eps*h)
     J2, _ = f(dofs - eps*h)
-    proc0_print("err", (J1-J2)/(2*eps) - dJh)
+    print("err", (J1-J2)/(2*eps) - dJh)
+
+# print("""
+# ################################################################################
+# ### Perform a Hessian test ######################################################
+# ################################################################################
+# """)
+
+# ddJ0 = hessian(f,dofs)
+# for eps in [1e-3, 1e-4, 1e-5, 1e-6, 1e-7]:
+#     J1, _ = f(dofs + eps*h)
+#     err = J1 - (J0 + eps*dJh + 0.5*eps**2*h.T@ddJ0@h)
+#     print("err", eps, err)
     
-proc0_print("""
+
+print("""
 ################################################################################
 ### Run the optimisation #######################################################
 ################################################################################
@@ -308,55 +375,105 @@ bs.set_points(s_plot.gamma().reshape((-1, 3)))
 pointData = {"B_N": np.sum(bs.B().reshape((qphi, qtheta, 3)) * s_plot.unitnormal(), axis=2)[:, :, None]}
 s_plot.to_vtk(OUT_DIR / f"surf_opt_{loop_label}", extra_data=pointData)
 bs.set_points(s.gamma().reshape((-1, 3)))
+BdotN = np.mean(np.abs(np.sum(bs.B().reshape((nphi, ntheta, 3)) * s.unitnormal(), axis=2)))
+avg_BdotN_over_B = BdotN / bs.AbsB().mean()
+Jf.x = res.x
 
 curves_to_vtk(base_curves, OUT_DIR / f"base_curves_opt_{loop_label}")
 # Save the optimized coil shapes and currents so they can be loaded into other scripts for analysis:
-bs.save(OUT_DIR / f"biot_savart_opt_{loop_label}.json")
+bs.save(OUT_DIR / "biot_savart_opt.json")
 
 #Perturb coils
 seed = 0
-squared_flux_data = []
-curves_pert_oos = []
 rg = Generator(PCG64DXSM(seed+1))
-sampler = GaussianSampler(curves[0].quadpoints, SIGMA_OOS, L_OOS, n_derivs=1)
-
-for i in range(N_OOS):
-    # first add the 'systematic' error. this error is applied to the base curves and hence the various symmetries are applied to it.
-    base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler, randomgen=rg)) for c in base_curves]
-    coils = coils_via_symmetries(base_curves_perturbed, base_currents, s.nfp, True)
-    # now add the 'statistical' error. this error is added to each of the final coils, and independent between all of them.
-    coils_pert = [Coil(CurvePerturbed_jsonfix(c.curve, PerturbationSample(sampler, randomgen=rg)), c.current) for c in coils]
-    # Squared Flux calculation
-    bs_pert = BiotSavart(coils_pert)
-    bs_pert.set_points(s.gamma().reshape((-1, 3)))
-    squared_flux_data.append(SquaredFlux(s, bs_pert).J())
-    #only save first 15 samples, for first initial guess
-    if slurm_array_int==0 and i<15: 
-        curves_pert_oos.append([c.curve for c in coils_pert])
-        curves_to_vtk(curves_pert_oos[i], OUT_DIR / f"curves_pert_oos_{loop_label}_sample_{i}")
-    #print progress
-    if (i+1) % (N_OOS/10) == 0:
-        proc0_print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
+sampler = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
+b_dot_n_pert = np.zeros((qphi, qtheta)) 
+squared_flux_data = [[],[],[],[],[]] if PERT_CURVE and PERT_CURRENT and PERT_CENTROID and PERT_ORIENTATION else [[]]
+curves_pert_oos = []
+perturbation_number = 5 if PERT_CURVE and PERT_CURRENT and PERT_CENTROID and PERT_ORIENTATION else 1
+for j in range(perturbation_number):
+    #perturb curves, centroids and currents, then currents only, then curves only, then centroid only
+    if j==0:
+        sampler_j = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
+        SIGMA_CENTROID_OOS_j = SIGMA_CENTROID_OOS
+        SIGMA_CURRENT_OOS_j = SIGMA_CURRENT_OOS
+        SIGMA_ORIENTATION_OOS_j = SIGMA_ORIENTATION_OOS
+    elif j==1:
+        #pert current only
+        sampler_j = GaussianSampler(curves[0].quadpoints, 0, L_CURVE_OOS, n_derivs=1)
+        SIGMA_CENTROID_OOS_j = 0
+        SIGMA_CURRENT_OOS_j = SIGMA_CURRENT_OOS
+        SIGMA_ORIENTATION_OOS_j = 0
+    elif j==2:
+        #pert curves only
+        sampler_j = GaussianSampler(curves[0].quadpoints, SIGMA_CURVE_OOS, L_CURVE_OOS, n_derivs=1)
+        SIGMA_CURRENT_OOS_j = 0
+        SIGMA_CENTROID_OOS_j = 0
+        SIGMA_ORIENTATION_OOS_j = 0
+    elif j==3:
+        #pert centroid only
+        sampler_j = GaussianSampler(curves[0].quadpoints, 0, L_CURVE_OOS, n_derivs=1)
+        SIGMA_CENTROID_OOS_j = SIGMA_CENTROID_OOS
+        SIGMA_CURRENT_OOS_j = 0
+        SIGMA_ORIENTATION_OOS_j = 0
+    elif j==4:
+        #pert orientation only
+        sampler_j = GaussianSampler(curves[0].quadpoints, 0, L_CURVE_OOS, n_derivs=1)
+        SIGMA_CENTROID_OOS_j = 0
+        SIGMA_CURRENT_OOS_j = 0
+        SIGMA_ORIENTATION_OOS_j = SIGMA_ORIENTATION_OOS
         
+    for i in range(N_OOS):
+        # systematic coil position error
+        base_curves_perturbed = [CurvePerturbed_jsonfix(c, PerturbationSample(sampler_j, randomgen=rg)) for c in base_curves]
+        # systematic coil centroid position error
+        base_curves_centroid_perturbed = [CentroidPerturbed(c,(rg.standard_normal(3), SIGMA_CENTROID_OOS_j*rg.standard_normal())) for c in base_curves_perturbed]
+        # systematic coil orientation error
+        base_curves_orientation_perturbed = [OrientationPerturbed(c, SIGMA_ORIENTATION_OOS_j*rg.standard_normal(3)) for c in base_curves_centroid_perturbed]
+        coils = coils_via_symmetries(base_curves_orientation_perturbed, base_currents, s.nfp, True)
+        # now add the 'statistical' error. this error is added to each of the final coils, and independent between all of them.
+        # statistical coil position and current error
+        coils_pert = [Coil(CurvePerturbed_jsonfix(c.curve, PerturbationSample(sampler_j, randomgen=rg)), CurrentPerturbed(c.current, SIGMA_CURRENT_OOS_j*rg.standard_normal())) for c in coils]
+        # statistical centroid position error
+        coils_centroid_pert = [Coil(CentroidPerturbed(c.curve,(rg.standard_normal(3), SIGMA_CENTROID_OOS_j*rg.standard_normal())),c.current) for c in coils_pert]
+        # statistical coil orientation error
+        coils_orientation_pert = [Coil(OrientationPerturbed(c.curve, SIGMA_ORIENTATION_OOS_j*rg.standard_normal(3)),c.current) for c in coils_centroid_pert]
+        # Squared Flux calculation
+        bs_pert = BiotSavart(coils_orientation_pert) 
+        bs_pert.set_points(s.gamma().reshape((-1, 3)))
+        squared_flux_data[j].append(SquaredFlux(s, bs_pert).J())
+        #only save first 15 samples
+        if j==0 and i<15: 
+            curves_pert_oos.append([c.curve for c in coils_orientation_pert])
+            curves_to_vtk(curves_pert_oos[-1], SUB_PERT_DIR / f"curves_opt_pert_oos_{loop_label}_sample_{i}")
+        #print progress
+        if (i+1) % (N_OOS/10) == 0:
+            print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
 
+        if (i+1) % (N_OOS/10) == 0:
+            print(f"Finished {i+1}/{N_OOS} Out-of-Sample Evaluations")
 
+    
 #store main results in string, print and save
 main_results_str = f"Flux Objective for exact coils    : {Jf.J():.3e}\n"
-main_results_str += f"Out-of-sample flux value                  : {np.mean(squared_flux_data):.3e}\n"
+main_results_str += f"Out-of-sample flux value                  : {np.mean(squared_flux_data[0]):.3e}\n"
 main_results_str += f"Objective Gradient (||∇J||)              : {np.linalg.norm(JF.dJ()):.3e}\n"
 main_results_str += f"Quality Number: {Jf.J()/np.mean(squared_flux_data):.3f}\n"
+main_results_str += f"<B_N>/<|B|> = {avg_BdotN_over_B:.2e}\n"
 
-proc0_print(main_results_str)
+
+print(main_results_str)
 
 with open(SUB_DIR / 'main_results.txt', 'a') as f:
-    f.write(f"Run {loop_label}: \n" + main_results_str)
+    f.write(f"Run {loop_label}: \n" + main_results_str + "\n")
 
 #save data as array for plotting
 np.savez(OUT_DIR / f"results_{loop_numerical_data_label}.npz",
-         saved_parameter = save_param,
-         sq_flux_value = Jf.J(),
-         perturbed_sq_flux_data = squared_flux_data,
-         gradient = np.linalg.norm(JF.dJ())
+        saved_parameter = save_param,
+        sq_flux_value = Jf.J(),
+        perturbed_sq_flux_data = squared_flux_data,
+        gradient = np.linalg.norm(JF.dJ()),
+        avg_BdotN_over_B = avg_BdotN_over_B,
          )
 
 #Save objective function values from outstr in fun() wrapper function
@@ -365,7 +482,7 @@ with open(SUB_DIR / 'objective_func_values.txt', 'a') as f:
     
 # Write input parameters to file
 # Just specify the variable names you want
-save_vars = ['SIGMA', 'L', 'MAXITER'
+save_vars = ['SIGMA', 'L', 'MAXITER', 'order'
              ]
 
 # Combine both
@@ -376,7 +493,7 @@ params = {
 
 with open(SUB_DIR / 'input_parameters_save.json', 'w') as f:
     json.dump(params, f, indent=1)
-    
+
 end = time.time()
 time_taken = f"Took {(end - start):.2f} for run {loop_label}."
 
@@ -384,4 +501,4 @@ time_taken = f"Took {(end - start):.2f} for run {loop_label}."
 with open(SUB_DIR / 'run_times.txt', 'a') as f:
             f.write(time_taken + "\n")
             
-proc0_print(f"Took {end-start}s")
+print(f"Took {end-start}s")
