@@ -38,7 +38,7 @@ from scipy.optimize import minimize
 from simsopt.field import BiotSavart, Current, Coil, coils_via_symmetries, coils_to_vtk
 from simsopt.geo import (CurveLength, CurveCurveDistance, curves_to_vtk, create_equally_spaced_curves, SurfaceRZFourier,
                          MeanSquaredCurvature, LpCurveCurvature, CurveSurfaceDistance, ArclengthVariation, GaussianSampler, 
-                         CurvePerturbed, PerturbationSample, LinkingNumber)
+                         CurvePerturbed_json_fix, PerturbationSample, LinkingNumber)
 from simsopt.objectives import QuadraticPenalty, MPIObjective, SquaredFlux
 from simsopt.geo import LinkingNumberfrom 
 from simsopt.field.force import LpCurveForce

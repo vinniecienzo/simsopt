@@ -219,7 +219,7 @@ class CurvePerturbed_json(sopp.Curve, Curve):
                 stell = []
                 for c in curves:
                     pert = PerturbationSample(sampler_systematic, randomgen=rg)
-                    stell.append(CurvePerturbed(c, pert))
+                    stell.append(CurvePerturbed_json_fix(c, pert))
                 perturbed_curves.append(stell)
         """
         self.curve = curve
